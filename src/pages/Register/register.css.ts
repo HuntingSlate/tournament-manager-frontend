@@ -3,13 +3,13 @@ import { style } from '@vanilla-extract/css';
 
 import { vars } from '@/src/theme';
 
-export const loginPageStyle = style({
+export const registerPageStyle = style({
 	alignItems: 'center',
 	justifyContent: 'center',
 	height: '100vh',
 });
 
-export const loginFormContainerStyle = style({
+export const registerFormContainerStyle = style({
 	border: `${rem(1)} solid ${vars.colors.gray[3]}`,
 	padding: `${rem(45)} ${rem(35)}`,
 	borderRadius: rem(4),

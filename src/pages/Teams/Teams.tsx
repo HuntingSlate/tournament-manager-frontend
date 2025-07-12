@@ -2,10 +2,10 @@ import type { FC } from 'react';
 
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 
-export const Games: FC = () => {
+export const Teams: FC = () => {
 	return (
 		<PageLayout>
-			<div>Games Screen</div>
+			<div>Teams Page</div>
 		</PageLayout>
 	);
 };

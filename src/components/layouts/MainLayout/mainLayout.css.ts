@@ -17,6 +17,7 @@ export const mainLayoutTopContainerStyle = style({
 	position: 'fixed',
 	borderBottom: `${rem(1)} solid ${vars.colors.gray[3]}`,
 	boxShadow: vars.shadows.xs,
+	backgroundColor: vars.colors.white,
 });
 
 export const mainLayoutMainStyle = styleVariants({
