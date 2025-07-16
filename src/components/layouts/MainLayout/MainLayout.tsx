@@ -18,13 +18,7 @@ export const MainLayout: FC<MainLayoutProps> = ({ withHeader = true }) => {
 					<Header />
 				</Stack>
 			)}
-			<main
-				className={
-					withHeader
-						? classes.mainLayoutMainStyle.withHeader
-						: classes.mainLayoutMainStyle.withoutHeader
-				}
-			>
+			<main className={classes.mainLayoutMainStyle}>
 				<Outlet />
 			</main>
 		</Stack>

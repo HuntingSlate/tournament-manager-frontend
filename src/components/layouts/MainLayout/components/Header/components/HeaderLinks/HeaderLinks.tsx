@@ -12,11 +12,11 @@ export const HeaderLinks: FC = () => {
 			<NavLink to={RoutePaths.Games} className={classes.headerLinkStyle}>
 				Games
 			</NavLink>
-			<NavLink to={RoutePaths.Tournaments} className={classes.headerLinkStyle}>
-				Tournaments
-			</NavLink>
 			<NavLink to={RoutePaths.Teams} className={classes.headerLinkStyle}>
 				Teams
+			</NavLink>
+			<NavLink to={RoutePaths.Players} className={classes.headerLinkStyle}>
+				Players
 			</NavLink>
 			<NavLink to={RoutePaths.Leaderboard} className={classes.headerLinkStyle}>
 				Leaderboard

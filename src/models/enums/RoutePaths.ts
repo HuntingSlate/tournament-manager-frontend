@@ -1,10 +1,24 @@
 export enum RoutePaths {
-	Home = '/',
-	Games = '/games',
 	Login = '/login',
-	Teams = '/teams',
-	Tournaments = '/tournaments',
-	Leaderboard = '/leaderboard',
 	Register = '/register',
+
+	Games = '/games',
+
+	Players = '/players',
+
+	Leaderboard = '/leaderboard',
+	LeaderboardByGame = '/leaderboard/:id',
+
+	Home = '/',
+	CreateTournament = '/tournaments/create',
+	TournamentDetails = '/tournaments/:id',
+	EditTournament = '/tournaments/:id/edit',
+
 	Profile = '/profile',
+	ProfileDetails = '/profile/:id',
+	ProfileEdit = '/profile/edit',
+
+	Teams = '/teams',
+	TeamDetails = '/teams/:id',
+	EditTeam = '/teams/:id/edit',
 }

@@ -1,32 +1,25 @@
 import { rem } from '@mantine/core';
-import { style, styleVariants } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 
 import { vars } from '@/src/theme';
 
 export const mainLayoutWrapperStyle = style({
 	gap: 0,
-	maxWidth: rem(1440),
+	display: 'flex',
 	margin: '0 auto',
+	flexDirection: 'column',
+	minHeight: '100vh',
 });
 
 export const mainLayoutTopContainerStyle = style({
-	top: 0,
-	left: 0,
-	right: 0,
-	zIndex: 100,
-	position: 'fixed',
 	borderBottom: `${rem(1)} solid ${vars.colors.gray[3]}`,
-	boxShadow: vars.shadows.xs,
+	boxShadow: vars.shadows.md,
 	backgroundColor: vars.colors.white,
 });
 
-export const mainLayoutMainStyle = styleVariants({
-	withHeader: {
-		height: '100vh',
-		paddingTop: rem(53),
-	},
-	withoutHeader: {
-		height: '100%',
-		paddingTop: 0,
-	},
+export const mainLayoutMainStyle = style({
+	backgroundColor: '#f9fafb',
+	flex: 1,
+	display: 'flex',
+	justifySelf: 'center',
 });

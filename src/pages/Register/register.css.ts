@@ -7,12 +7,14 @@ export const registerPageStyle = style({
 	alignItems: 'center',
 	justifyContent: 'center',
 	height: '100vh',
+	width: '100%',
 });
 
 export const registerFormContainerStyle = style({
 	border: `${rem(1)} solid ${vars.colors.gray[3]}`,
 	padding: `${rem(45)} ${rem(35)}`,
 	borderRadius: rem(4),
+  backgroundColor: vars.colors.white,
 	boxShadow: vars.shadows.md,
 	gap: rem(24),
 	width: rem(400),

@@ -10,6 +10,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@/src': path.resolve(__dirname, 'src'),
+			'@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
 		},
 	},
 });

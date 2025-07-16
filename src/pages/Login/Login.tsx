@@ -7,10 +7,10 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import z from 'zod';
 
+import { useLoginMutation } from '@/src/api/mutations/authMutations';
 import { HeaderLogo } from '@/src/components/layouts/MainLayout/components/Header/components/HeaderLogo';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import * as classes from '@/src/pages/Login/login.css';
-import { useLoginMutation } from '@/src/pages/Login/login.utils';
 
 const loginSchema = z.object({
 	email: z
@@ -23,7 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const Login: FC = () => {
 	const [visible, { toggle }] = useDisclosure(false);
-	const { mutate, isPending, error } = useLoginMutation();
+	const { mutate, isPending } = useLoginMutation();
 
 	const {
 		register,
@@ -39,7 +39,7 @@ export const Login: FC = () => {
 
 	return (
 		<Stack className={classes.loginPageStyle}>
-			<HeaderLogo withLink={false} />
+			<HeaderLogo />
 			<form onSubmit={handleSubmit(handleLogin)}>
 				<Stack className={classes.loginFormContainerStyle}>
 					<Stack style={{ gap: 4 }}>
@@ -83,11 +83,6 @@ export const Login: FC = () => {
 					<Button style={{ width: '100%' }} type='submit' loading={isPending}>
 						Login
 					</Button>
-					{error && (
-						<Text c='red' size='xs' ta='center'>
-							{error.message}
-						</Text>
-					)}
 				</Stack>
 			</form>
 			<Text size='xs'>

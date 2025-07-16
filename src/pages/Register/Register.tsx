@@ -7,10 +7,10 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { useRegisterMutation } from '@/src/api/mutations/authMutations';
 import { HeaderLogo } from '@/src/components/layouts/MainLayout/components/Header/components/HeaderLogo';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import * as classes from '@/src/pages/Register/register.css';
-import { useRegisterMutation } from '@/src/pages/Register/register.utils';
 
 const registerSchema = z.object({
 	email: z
@@ -27,7 +27,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const Register: FC = () => {
 	const [visible, { toggle }] = useDisclosure(false);
-	const { mutate, isPending, error } = useRegisterMutation();
+	const { mutate, isPending } = useRegisterMutation();
 
 	const {
 		register,
@@ -43,7 +43,7 @@ export const Register: FC = () => {
 
 	return (
 		<Stack className={classes.registerPageStyle}>
-			<HeaderLogo withLink={false} />
+			<HeaderLogo />
 			<form onSubmit={handleSubmit(handleRegister)}>
 				<Stack className={classes.registerFormContainerStyle}>
 					<Stack style={{ gap: 4 }}>
@@ -100,11 +100,6 @@ export const Register: FC = () => {
 					<Button style={{ width: '100%' }} type='submit' loading={isPending}>
 						Register
 					</Button>
-					{error && (
-						<Text c='red' size='xs' ta='center'>
-							{error.message}
-						</Text>
-					)}
 				</Stack>
 			</form>
 			<Text size='xs'>

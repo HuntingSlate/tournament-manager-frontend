@@ -1,13 +1,15 @@
+import type { Team } from '@/src/api/team';
 import { api } from '@/src/utils/AxiosInstance';
 
-type ProfileLink = { id: number; url: string; type: string; platformUsername?: string };
+export type ProfileLink = { id: number; url: string; type: string; platformUsername?: string };
 
-type UserProfile = {
+export type UserProfile = {
 	id: number;
 	email: string;
 	nickname: string;
 	fullName: string;
 	links: ProfileLink[];
+	teams: Team[];
 };
 
 export type UpdateProfileData = { fullName?: string; nickname?: string };
@@ -54,6 +56,11 @@ export const getProfileById = async (userId: number): Promise<UserProfile> => {
 };
 
 export const searchProfileByName = async (name: string): Promise<UserProfile[]> => {
-	const { data } = await api.get<UserProfile[]>('/users/search', { params: { name } });
+	const { data } = await api.get<UserProfile[]>('/users/search', { params: { nickname: name } });
+	return data;
+};
+
+export const getUserTeams = async (): Promise<Team[]> => {
+	const { data } = await api.get<Team[]>('/users/me/teams');
 	return data;
 };

@@ -11,34 +11,25 @@ type RegisterData = {
 	password: string;
 };
 
-type LoginResponse = {
+export type AuthResponse = {
 	token: string;
-	user: {
-		id: number;
-		email: string;
-		nickname: string;
-		fullName?: string;
-	};
+	userId: number;
+	email: string;
+	nickname: string;
+	fullName?: string;
+	role: 'ROLE_USER' | 'ROLE_ADMIN';
 };
 
-type RegisterResponse = {
-	token: string;
-	user: {
-		id: number;
-		email: string;
-		nickname: string;
-		fullName?: string;
-	};
-};
-
-export const login = async (loginData: LoginData): Promise<LoginResponse> => {
-	const { data } = await api.post<LoginResponse>('/auth/login', loginData);
+export const login = async (loginData: LoginData): Promise<AuthResponse> => {
+	const { data } = await api.post<AuthResponse>('/auth/login', loginData);
 
 	return data;
 };
 
-export const register = async (registerData: RegisterData): Promise<RegisterResponse> => {
-	const { data } = await api.post<RegisterResponse>('/auth/register', registerData);
+export const register = async (registerData: RegisterData): Promise<AuthResponse> => {
+	const { data } = await api.post<AuthResponse>('/auth/register', registerData);
 
 	return data;
 };
+
+export const deleteAccount = async (): Promise<void> => await api.delete('/auth/me');

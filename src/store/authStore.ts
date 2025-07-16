@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import type { AuthResponse } from '@/src/api/auth';
+
 type User = {
 	id: number;
 	email: string;
 	nickname: string;
 	fullName?: string;
+	isAdmin: boolean;
 };
 
 type AuthStateProperties = {
@@ -14,9 +17,10 @@ type AuthStateProperties = {
 };
 
 type AuthActions = {
-	loginSuccess: (token: string, user: User) => void;
+	loginSuccess: (data: AuthResponse) => void;
 	logout: () => void;
 	isAuthenticated: () => boolean;
+	isAdmin: () => boolean;
 };
 
 type AuthState = AuthStateProperties & AuthActions;
@@ -28,13 +32,20 @@ export const useAuthStore = create(
 		(set, get) => ({
 			token: null,
 			user: null,
-			loginSuccess: (token, user) => {
-				set({ token, user });
+			loginSuccess: (data: AuthResponse) => {
+				const user: User = {
+					id: data.userId,
+					email: data.email,
+					nickname: data.nickname,
+					isAdmin: data.role === 'ROLE_ADMIN',
+				};
+				set({ token: data.token, user: user });
 			},
 			logout: () => {
 				set({ token: null, user: null });
 			},
 			isAuthenticated: () => !!get().token,
+			isAdmin: () => !!get().user?.isAdmin,
 		}),
 		{
 			name: 'auth-storage',
