@@ -31,6 +31,7 @@ export type Match = {
 	winningTeamId: number;
 	winningTeamName: string;
 	bracketLevel: number;
+	matchNumberInRound: number;
 	firstTeamScore: number;
 	secondTeamScore: number;
 	status: MatchStatus;

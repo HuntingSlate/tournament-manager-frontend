@@ -1,0 +1,80 @@
+.tournament-bracket {
+	display: grid;
+	gap: 50px;
+	width: 100%;
+}
+
+.round {
+	display: flex;
+	flex-direction: column;
+}
+
+.round-title {
+	text-align: center;
+	margin-bottom: 24px;
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.8rem;
+	letter-spacing: 1px;
+}
+
+.matches-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	flex-grow: 1;
+}
+
+.match-card {
+	border-radius: var(--mantine-radius-sm);
+	margin-bottom: 40px;
+	position: relative;
+	border: 1px solid var(--mantine-color-dark-4);
+}
+
+.match-card:last-child {
+	margin-bottom: 0;
+}
+
+.match-card::after {
+	content: '';
+	position: absolute;
+	right: -26px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 25px;
+	height: 2px;
+	background-color: var(--mantine-color-dark-3);
+}
+
+.round:last-child .match-card::after {
+	display: none;
+}
+
+.placeholder-card {
+	border-style: solid;
+}
+
+.team {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px;
+	transition:
+		background-color 0.2s,
+		color 0.2s;
+}
+
+.team:first-of-type {
+	border-bottom: 1px solid var(--mantine-color-dark-4);
+}
+
+.team.winner {
+	background-color: #2b8a3e;
+	color: white;
+}
+
+.team.winner .team-name,
+.team.winner .team-score {
+	font-weight: 700;
+}

@@ -1,9 +1,8 @@
 import type { FC } from 'react';
 
-import { Group, TextInput, Select, ActionIcon } from '@mantine/core';
+import { Group, TextInput, Select, Button } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDebouncedValue } from '@mantine/hooks';
-import { IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 
 import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
@@ -72,65 +71,58 @@ export const TournamentFilters: FC<TournamentFiltersProps> = ({
 	};
 
 	return (
-		<form>
-			<Group w='100%' wrap='nowrap' align='center'>
-				<TextInput
-					w='100%'
-					label='Tournament Name'
-					placeholder='Enter name...'
-					value={name}
-					onChange={(e) => setName(e.currentTarget.value)}
-				/>
-				<TextInput
-					label='Location (city)'
-					w='100%'
-					placeholder='Enter city...'
-					value={location}
-					onChange={(e) => setLocation(e.currentTarget.value)}
-				/>
-				<Select
-					label='Game'
-					w='100%'
-					placeholder='Select game'
-					data={gameSelectData}
-					clearable
-					value={gameName}
-					onChange={setGameName}
-				/>
-				<Select
-					label='Status'
-					w='100%'
-					placeholder='Select status'
-					data={statusSelectData}
-					clearable
-					value={status}
-					onChange={(value) => setStatus(value as typeof status)}
-				/>
-				<DatePickerInput
-					type='range'
-					w='100%'
-					label='Date Range'
-					placeholder='Select dates'
-					clearable
-					allowSingleDateInRange
-					value={dateRange}
-					onChange={(dates) => {
-						const [start, end] = dates;
-						const startDate = start ? new Date(start) : null;
-						const endDate = end ? new Date(end) : null;
-						setDateRange([startDate, endDate]);
-					}}
-				/>
-				<ActionIcon
-					variant='light'
-					color='red'
-					size='input-sm'
-					onClick={handleReset}
-					style={{ alignSelf: 'flex-end' }}
-				>
-					<IconX size={16} />
-				</ActionIcon>
-			</Group>
-		</form>
+		<Group wrap='nowrap' align='center'>
+			<TextInput
+				label='Tournament Name'
+				placeholder='Enter name...'
+				value={name}
+				onChange={(e) => setName(e.currentTarget.value)}
+			/>
+			<TextInput
+				label='Location (city)'
+				placeholder='Enter city...'
+				value={location}
+				onChange={(e) => setLocation(e.currentTarget.value)}
+			/>
+			<Select
+				label='Game'
+				placeholder='Select game'
+				data={gameSelectData}
+				clearable
+				value={gameName}
+				onChange={setGameName}
+			/>
+			<Select
+				label='Status'
+				placeholder='Select status'
+				data={statusSelectData}
+				clearable
+				value={status}
+				onChange={(value) => setStatus(value as typeof status)}
+			/>
+			<DatePickerInput
+				type='range'
+				label='Date Range'
+				placeholder='Select dates'
+				clearable
+				allowSingleDateInRange
+				value={dateRange}
+				onChange={(dates) => {
+					const [start, end] = dates;
+					const startDate = start ? new Date(start) : null;
+					const endDate = end ? new Date(end) : null;
+					setDateRange([startDate, endDate]);
+				}}
+			/>
+			<Button
+				variant='light'
+				color='blue'
+				size='input-sm'
+				onClick={handleReset}
+				style={{ alignSelf: 'flex-end', width: 'max-content' }}
+			>
+				Clear Filters
+			</Button>
+		</Group>
 	);
 };

@@ -14,6 +14,7 @@ import { EditTournament } from '@/src/pages/EditTournament';
 import { Games } from '@/src/pages/Games';
 import { Leaderboard } from '@/src/pages/Leaderboard';
 import { Login } from '@/src/pages/Login';
+import { MatchDetails } from '@/src/pages/MatchDetails';
 import { Matches } from '@/src/pages/Matches';
 import { Players } from '@/src/pages/Players/Players';
 import { Profile } from '@/src/pages/Profile';
@@ -57,6 +58,7 @@ const router = createBrowserRouter(
 				<Route path={RoutePaths.Players} element={<Players />} />
 
 				<Route path={RoutePaths.Matches} element={<Matches />} />
+				<Route path={RoutePaths.MatchDetails} element={<MatchDetails />} />
 			</Route>
 
 			<Route element={<MainLayout withHeader={false} />}>

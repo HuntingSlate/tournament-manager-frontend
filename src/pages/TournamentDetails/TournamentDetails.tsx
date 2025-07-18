@@ -57,7 +57,10 @@ export const TournamentDetails: FC = () => {
 							</Button>
 						)}
 						{canGoToMatches && (
-							<Button variant='subtle' onClick={() => navigate(RoutePaths.Matches)}>
+							<Button
+								variant='subtle'
+								onClick={() => navigate(RoutePaths.MatchDetails.replace(':id', id!))}
+							>
 								Ladder
 							</Button>
 						)}
