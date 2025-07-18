@@ -23,8 +23,8 @@ export const ProfileTeam: FC<ProfileTeamProps> = ({ team }) => {
 	return (
 		<Group p={16} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de' justify='space-between'>
 			<Group gap={12}>
-				<Flex style={{ padding: 8, backgroundColor: vars.colors.pink[1], borderRadius: '50%' }}>
-					<IconUsersGroup size={20} />
+				<Flex style={{ padding: 12, backgroundColor: vars.colors.pink[1], borderRadius: '50%' }}>
+					<IconUsersGroup size={32} />
 				</Flex>
 				<Text size='md' fw={600}>
 					{team?.name}

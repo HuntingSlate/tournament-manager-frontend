@@ -105,7 +105,7 @@ export const TeamDetails = () => {
 							<TeamTournament
 								key={tournament.tournamentId}
 								tournamentId={tournament.tournamentId}
-								status={tournament.status}
+								status={tournament.tournamentStatus}
 								tournamentName={tournament.tournamentName}
 							/>
 						))}

@@ -18,8 +18,8 @@ export const TournamentApplication: FC<TournamentApplicationProps> = ({ applicat
 	return (
 		<Group p={16} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de' justify='space-between'>
 			<Group gap={12}>
-				<Flex style={{ padding: 8, backgroundColor: vars.colors.green[1], borderRadius: '50%' }}>
-					<IconMailQuestion size={20} />
+				<Flex style={{ padding: 12, backgroundColor: vars.colors.green[1], borderRadius: '50%' }}>
+					<IconMailQuestion size={32} />
 				</Flex>
 				<Text size='md' fw={600}>
 					{application?.teamName}
