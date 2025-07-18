@@ -33,8 +33,8 @@ export const TeamMember: FC<TeamMemberProps> = ({
 			}}
 		>
 			<Group gap={12}>
-				<Flex style={{ padding: 8, backgroundColor: vars.colors.blue[1], borderRadius: '50%' }}>
-					<IconUser size={20} />
+				<Flex style={{ padding: 12, backgroundColor: vars.colors.blue[1], borderRadius: '50%' }}>
+					<IconUser size={32} />
 				</Flex>
 				<Stack gap={0}>
 					<Group gap={6}>

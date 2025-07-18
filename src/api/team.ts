@@ -27,7 +27,7 @@ export type Team = {
 	tournaments: Array<{
 		tournamentId: number;
 		tournamentName: string;
-		status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELED';
+		tournamentStatus: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELED';
 	}>;
 };
 

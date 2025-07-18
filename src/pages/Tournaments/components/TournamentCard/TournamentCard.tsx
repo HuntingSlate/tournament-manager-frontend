@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import type { Tournament } from '@/src/api/tournament';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { vars } from '@/src/theme';
+import { StatusIndicator } from '@/src/components/StatusIndicator';
 
 type TournamentCardProps = {
 	tournament: Tournament;
@@ -29,7 +30,7 @@ export const TournamentCard: FC<TournamentCardProps> = ({ tournament }) => {
 						<Text size='xs' fw={500} style={{ width: '150px' }}>
 							{tournament.gameName}
 						</Text>
-						<Text size='xs'>{tournament.status}</Text>
+						<StatusIndicator status={tournament.status}/>
 						<Group gap={4} align='center'>
 							<IconCalendarEvent size={15} />
 							<Text size='xs'>

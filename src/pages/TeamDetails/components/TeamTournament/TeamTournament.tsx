@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { vars } from '@/src/theme';
+import { StatusIndicator } from '@/src/components/StatusIndicator';
 
 type TeamTournamentProps = {
 	tournamentId: number;
@@ -20,17 +21,19 @@ export const TeamTournament: FC<TeamTournamentProps> = ({
 }) => {
 	const navigate = useNavigate();
 
+	console.log(status, 'co')
+
 	return (
 		<Group p={16} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de' justify='space-between'>
 			<Group gap={12}>
-				<Flex p={8} bg={vars.colors.yellow[2]} bdrs='50%'>
-					<IconTrophy size={20} />
+				<Flex p={12} bg={vars.colors.yellow[2]} bdrs='50%'>
+					<IconTrophy size={32} />
 				</Flex>
-				<Stack gap={0}>
+				<Stack gap={8}>
 					<Text size='md' fw={600}>
 						{tournamentName}
 					</Text>
-					<Text size='xs'>{status}</Text>
+					<StatusIndicator status={status}/>
 				</Stack>
 			</Group>
 			<Button
