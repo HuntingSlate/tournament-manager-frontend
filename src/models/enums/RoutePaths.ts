@@ -12,6 +12,7 @@ export enum RoutePaths {
 	Home = '/',
 	CreateTournament = '/tournaments/create',
 	TournamentDetails = '/tournaments/:id',
+	TournamentByGame = '/tournaments/game/:gameId',
 	EditTournament = '/tournaments/:id/edit',
 
 	Profile = '/profile',
@@ -21,4 +22,8 @@ export enum RoutePaths {
 	Teams = '/teams',
 	TeamDetails = '/teams/:id',
 	EditTeam = '/teams/:id/edit',
+
+	Matches = '/matches',
+	MatchDetails = '/matches/:id',
+	EditMatch = '/matches/:id/edit',
 }

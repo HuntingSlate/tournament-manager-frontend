@@ -27,7 +27,7 @@ type PlayerMatchStatistics = {
 export const getPlayerLeaderboardFromGame = async (
 	gameId: number
 ): Promise<GamePlayerRanking[]> => {
-	const { data } = await api.get(`/statistics/ranking/game/${gameId}/kills`);
+	const { data } = await api.get(`/statistics/ranking/game/${gameId}`);
 	return data;
 };
 

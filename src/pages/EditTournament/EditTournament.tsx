@@ -8,23 +8,35 @@ import {
 	InputWrapper,
 	Loader,
 	Select,
+	Text,
 	Stack,
 	Textarea,
 	Title,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { IconChevronLeft } from '@tabler/icons-react';
-import { useEffect, useState, type FC } from 'react';
+import { useEffect, type FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 import z from 'zod';
 
+import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
+import {
+	useEditTournamentMutation,
+	useGetTournamentApplicationsQuery,
+	useGetTournamentByIdQuery,
+} from '@/src/api/mutations/tournamentMutations';
+import type { Tournament } from '@/src/api/tournament';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { TournamentMap } from '@/src/components/TournamentMap';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
-import { useEditTournamentMutation } from '@/src/pages/EditTournament/editTournament.utils';
-import { useGamesQuery } from '@/src/pages/Games/games.utils';
-import { useTournamentDetailsQuery } from '@/src/pages/TournamentDetails/tournamentDetails.utils';
+import { EditTournamentApplications } from '@/src/pages/EditTournament/components/EditTournamentApplications';
+import { EditTournamentTeams } from '@/src/pages/EditTournament/components/EditTournamentTeams';
+import { useAuthStore } from '@/src/store/authStore';
+import { vars } from '@/src/theme';
 import { useAutoGeocode } from '@/src/utils/Geocode';
+
+type DateRangeValue = [Date | null, Date | null];
 
 const editTournamentSchema = z.object({
 	name: z
@@ -32,20 +44,16 @@ const editTournamentSchema = z.object({
 		.min(1, 'Tournament name is required')
 		.max(255, 'Tournament name must not exceed 255 characters'),
 	description: z.string().max(500, 'Description must not exceed 500 characters').optional(),
-	startDate: z
-		.string()
-		.min(1, 'Start date is required')
-		.regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' }),
-	endDate: z
-		.string()
-		.regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' })
-		.optional()
-		.or(z.literal('')),
+	dateRange: z
+		.tuple([z.coerce.date().nullable(), z.coerce.date().nullable()])
+		.refine((val): val is [Date, Date] => !!val && val[0] !== null && val[1] !== null, {
+			message: 'Both start and end date are required.',
+		}),
 	gameId: z.string().min(1, { message: 'You must select a game.' }),
-	city: z.string().min(1, { message: 'City is required' }),
-	street: z.string().min(1, { message: 'Street is required' }),
-	buildingNumber: z.string().min(1, { message: 'Building number is required' }),
-	postalCode: z.string().min(1, { message: 'Postal code is required' }),
+	city: z.string().optional(),
+	street: z.string().optional(),
+	buildingNumber: z.string().optional(),
+	postalCode: z.string().optional(),
 	maxTeams: z.coerce
 		.number()
 		.min(2, { message: 'Minimum 2 teams required' })
@@ -55,66 +63,78 @@ const editTournamentSchema = z.object({
 		}),
 	latitude: z.number().optional(),
 	longitude: z.number().optional(),
-	status: z.enum(['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELED']).optional(),
+	status: z.enum(['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELED']),
 });
 
-type EditTournamentFormValues = z.infer<typeof editTournamentSchema>;
+type EditTournamentFormValues = Omit<z.infer<typeof editTournamentSchema>, 'dateRange'> & {
+	dateRange: DateRangeValue;
+};
 
 export const EditTournament: FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-
-	const { data: games, isLoading: isGamesLoading } = useGamesQuery();
-	const { data: tournament, isLoading: isTournamentLoading } = useTournamentDetailsQuery(id!);
+	const isAdmin = useAuthStore((state) => state.isAdmin());
+	const userId = useAuthStore((state) => state.user?.id);
+	const { data: games, isLoading: isGamesLoading } = useGetGamesQuery();
+	const { data: tournament, isLoading: isTournamentLoading } = useGetTournamentByIdQuery(id!);
+	const isOrganizer = userId === tournament?.organizerId;
+	const { data: tournamentApplications, isLoading: isApplicationsLoading } =
+		useGetTournamentApplicationsQuery(id!, isOrganizer || isAdmin);
 	const { mutate, isPending } = useEditTournamentMutation(id!);
-
-	const [mapPosition, setMapPosition] = useState<[number, number] | undefined>();
 
 	const methods = useForm({
 		resolver: zodResolver(editTournamentSchema),
+		defaultValues: {
+			name: '',
+			description: '',
+			gameId: '',
+			city: '',
+			street: '',
+			buildingNumber: '',
+			postalCode: '',
+			maxTeams: 4,
+			status: 'PENDING',
+			dateRange: [null, null],
+		},
 	});
 
 	const {
+		control,
 		formState: { isDirty },
 		reset,
+		setValue,
+		watch,
 	} = methods;
 
-	const handleReset = () => {
-		reset();
-		if (tournament?.latitude && tournament?.longitude) {
-			setMapPosition([Number(tournament.latitude), Number(tournament.longitude)]);
-		}
-	};
+	const [latitude, longitude] = watch(['latitude', 'longitude']);
 
 	useEffect(() => {
 		if (tournament) {
 			reset({
 				name: tournament.name,
-				description: tournament.description,
-				startDate: tournament.startDate,
-				endDate: tournament.endDate,
+				description: tournament.description || '',
 				gameId: tournament.gameId.toString(),
-				city: tournament.city,
-				postalCode: tournament.postalCode,
-				street: tournament.street,
-				buildingNumber: tournament.buildingNumber?.toString(),
+				city: tournament.city || '',
+				postalCode: tournament.postalCode || '',
+				street: tournament.street || '',
+				buildingNumber: tournament.buildingNumber?.toString() || '',
 				maxTeams: tournament.maxTeams,
 				status: tournament.status,
+				dateRange: [new Date(tournament.startDate), new Date(tournament.endDate)],
+				latitude: tournament.latitude ? Number(tournament.latitude) : undefined,
+				longitude: tournament.longitude ? Number(tournament.longitude) : undefined,
 			});
-
-			if (tournament.latitude && tournament.longitude) {
-				setMapPosition([Number(tournament.latitude), Number(tournament.longitude)]);
-			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [tournament, methods.reset]);
+	}, [tournament, reset]);
 
-	const watchedAddress = methods.watch(['city', 'postalCode', 'street', 'buildingNumber']);
-	useAutoGeocode(watchedAddress, ({ lat, lon }) => {
-		setMapPosition([lat, lon]);
-		methods.setValue('latitude', lat, { shouldValidate: true });
-		methods.setValue('longitude', lon, { shouldValidate: true });
-	});
+	const watchedAddress = watch(['city', 'postalCode', 'street', 'buildingNumber']);
+	useAutoGeocode(
+		watchedAddress.map((v) => v ?? ''),
+		({ lat, lon }) => {
+			setValue('latitude', lat, { shouldValidate: true });
+			setValue('longitude', lon, { shouldValidate: true });
+		}
+	);
 
 	const isAddressComplete = watchedAddress.some(Boolean);
 
@@ -132,15 +152,33 @@ export const EditTournament: FC = () => {
 	];
 
 	const onSubmit = (data: EditTournamentFormValues) => {
-		const submissionData = {
-			...data,
-			gameId: Number(data.gameId),
-			buildingNumber: Number(data.buildingNumber),
+		if (!tournament) {
+			return;
+		}
+
+		const { dateRange, ...rest } = data;
+
+		const updatedFields = {
+			...rest,
+			gameId: Number(rest.gameId),
+			buildingNumber: Number(rest.buildingNumber),
+			startDate: dateRange[0]!.toISOString().split('T')[0],
+			endDate: dateRange[1]!.toISOString().split('T')[0],
 		};
-		mutate(submissionData as any);
+
+		const finalSubmissionData: Tournament = {
+			...tournament,
+			...updatedFields,
+		};
+
+		mutate(finalSubmissionData, {
+			onSuccess: () => {
+				methods.reset();
+			},
+		});
 	};
 
-	if (isTournamentLoading) {
+	if (isTournamentLoading || isApplicationsLoading || isGamesLoading) {
 		return (
 			<PageLayout>
 				<Flex style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -154,8 +192,8 @@ export const EditTournament: FC = () => {
 		<PageLayout>
 			<FormProvider {...methods}>
 				<form onSubmit={methods.handleSubmit(onSubmit)}>
-					<Stack style={{ gap: 16 }}>
-						<Group>
+					<Group justify='space-between'>
+						<Group gap={8}>
 							<ActionIcon
 								variant='transparent'
 								onClick={() => navigate(RoutePaths.TournamentDetails.replace(':id', id!))}
@@ -164,13 +202,33 @@ export const EditTournament: FC = () => {
 							</ActionIcon>
 							<Title order={2}>Edit Tournament</Title>
 						</Group>
-						<Group grow align='flex-start'>
-							<Stack style={{ flex: 1, gap: 16, alignContent: 'flex-start' }}>
-								<InputWrapper
-									size='sm'
-									label='Tournament Name'
-									error={methods.formState.errors.name?.message}
-								>
+						<Group gap={8}>
+							<Button
+								color='red'
+								variant='light'
+								onClick={() => methods.reset()}
+								disabled={!isDirty || isPending}
+							>
+								Reset
+							</Button>
+							<Button
+								color='green'
+								variant='light'
+								type='submit'
+								loading={isPending}
+								disabled={!isDirty || isPending}
+							>
+								Submit
+							</Button>
+						</Group>
+					</Group>
+					<Stack gap={16} mt={16}>
+						<Stack p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
+							<Text size='lg' fw={500}>
+								Information
+							</Text>
+							<Stack>
+								<InputWrapper size='sm' label='Name' error={methods.formState.errors.name?.message}>
 									<Input
 										size='md'
 										placeholder='Type tournament name'
@@ -188,33 +246,23 @@ export const EditTournament: FC = () => {
 										{...methods.register('description')}
 									/>
 								</InputWrapper>
-								<Group style={{ flexWrap: 'nowrap' }}>
-									<InputWrapper
-										size='sm'
-										label='Start Date'
-										style={{ width: '100%' }}
-										error={methods.formState.errors.startDate?.message}
-									>
-										<Input
-											size='md'
-											placeholder='Type start date (YYYY-MM-DD)'
-											{...methods.register('startDate')}
-										/>
-									</InputWrapper>
-									<InputWrapper
-										size='sm'
-										label='End Date'
-										style={{ width: '100%' }}
-										error={methods.formState.errors.endDate?.message}
-									>
-										<Input
-											size='md'
-											placeholder='Type end date (YYYY-MM-DD)'
-											{...methods.register('endDate')}
-										/>
-									</InputWrapper>
-								</Group>
-								<Group style={{ flexWrap: 'nowrap' }}>
+								<Controller
+									name='dateRange'
+									control={control}
+									render={({ field, fieldState }) => (
+										<InputWrapper label='Date Range' error={fieldState.error?.message}>
+											<DatePickerInput
+												type='range'
+												placeholder='Select date range'
+												valueFormat='YYYY-MM-DD'
+												value={field.value as [Date | null, Date | null]}
+												onChange={(value) => field.onChange(value)}
+												size='md'
+											/>
+										</InputWrapper>
+									)}
+								/>
+								<Group w='100%' wrap='nowrap'>
 									<Controller
 										name='gameId'
 										control={methods.control}
@@ -268,8 +316,13 @@ export const EditTournament: FC = () => {
 									</InputWrapper>
 								</Group>
 							</Stack>
-							<Stack style={{ flex: 1 }}>
-								<Group style={{ flexWrap: 'nowrap' }}>
+						</Stack>
+						<Stack p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
+							<Text size='lg' fw={500}>
+								Location
+							</Text>
+							<Stack>
+								<Group w='100%' wrap='nowrap'>
 									<InputWrapper
 										size='sm'
 										label='Street'
@@ -291,7 +344,7 @@ export const EditTournament: FC = () => {
 										/>
 									</InputWrapper>
 								</Group>
-								<Group style={{ flexWrap: 'nowrap' }}>
+								<Group w='100%' wrap='nowrap'>
 									<InputWrapper
 										size='sm'
 										label='City'
@@ -308,32 +361,20 @@ export const EditTournament: FC = () => {
 										/>
 									</InputWrapper>
 								</Group>
-								{isAddressComplete && mapPosition && <TournamentMap position={mapPosition} />}
+								{isAddressComplete && !latitude && !longitude && (
+									<Flex justify='center' align='center' h={300} bg='gray.0'>
+										<Loader />
+									</Flex>
+								)}
+								{latitude && longitude && <TournamentMap position={[latitude, longitude]} />}
 							</Stack>
-						</Group>
-						<Group style={{ justifyContent: 'flex-end', marginTop: 16 }}>
-							{isDirty ? (
-								<Button color='red' onClick={handleReset}>
-									Reset
-								</Button>
-							) : (
-								<Button
-									color='blue'
-									onClick={() => navigate(RoutePaths.TournamentDetails.replace(':id', id!))}
-								>
-									Cancel
-								</Button>
-							)}
-
-							<Button
-								type='submit'
-								color='green'
-								loading={isPending}
-								disabled={!isDirty || isPending}
-							>
-								Submit
-							</Button>
-						</Group>
+						</Stack>
+						<EditTournamentTeams
+							tournamentId={Number(id)}
+							tournament={tournament?.participatingTeams}
+							maxTeams={tournament?.maxTeams}
+						/>
+						<EditTournamentApplications applications={tournamentApplications} />
 					</Stack>
 				</form>
 			</FormProvider>

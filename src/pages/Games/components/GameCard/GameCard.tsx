@@ -1,5 +1,5 @@
-import { Button, Group, Title } from '@mantine/core';
-import { IconDeviceGamepad2 } from '@tabler/icons-react';
+import { ActionIcon, Button, Group, Title } from '@mantine/core';
+import { IconChartBarPopular, IconDeviceGamepad2, IconTournament } from '@tabler/icons-react';
 import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -41,18 +41,24 @@ export const GameCard: FC<GameCardProps> = ({ game, isAdmin, isDeletable }) => {
 					<Title order={3}>{game.name}</Title>
 				</Group>
 				<Group gap={10}>
-					<Button variant='subtle' color='blue'>
-						Tournaments
-					</Button>
-					<Button
+					<ActionIcon
+						size='lg'
+						variant='subtle'
+						color='blue'
+						onClick={() => navigate(`${RoutePaths.Home}?gameName=${encodeURIComponent(game.name)}`)}
+					>
+						<IconTournament size={16} />
+					</ActionIcon>
+					<ActionIcon
+						size='lg'
 						variant='subtle'
 						color='green'
 						onClick={() =>
 							navigate(RoutePaths.LeaderboardByGame.replace(':id', game.id.toString()))
 						}
 					>
-						Leaderboard
-					</Button>
+						<IconChartBarPopular size={16} />
+					</ActionIcon>
 					{isAdmin && (
 						<>
 							<Button variant='subtle' color='blue' onClick={() => setEditModalOpen(true)}>

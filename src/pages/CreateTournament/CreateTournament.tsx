@@ -16,11 +16,11 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import z from 'zod';
 
+import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { TournamentMap } from '@/src/components/TournamentMap';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { useCreateTournamentMutation } from '@/src/pages/CreateTournament/createTournament.utils';
-import { useGamesQuery } from '@/src/pages/Games/games.utils';
 import { useAutoGeocode } from '@/src/utils/Geocode';
 
 const createTournamentSchema = z.object({
@@ -59,7 +59,7 @@ type CreateTournamentFormValues = z.infer<typeof createTournamentSchema>;
 export const CreateTournament: FC = () => {
 	const navigate = useNavigate();
 	const [mapPosition, setMapPosition] = useState<[number, number]>([52.237049, 21.017532]);
-	const { data: games, isLoading: isGamesLoading } = useGamesQuery();
+	const { data: games, isLoading: isGamesLoading } = useGetGamesQuery();
 	const { mutate, isPending } = useCreateTournamentMutation();
 
 	const methods = useForm({

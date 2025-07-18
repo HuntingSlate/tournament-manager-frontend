@@ -12,9 +12,9 @@ import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { CreateTournament } from '@/src/pages/CreateTournament';
 import { EditTournament } from '@/src/pages/EditTournament';
 import { Games } from '@/src/pages/Games';
-import { Home } from '@/src/pages/Home';
 import { Leaderboard } from '@/src/pages/Leaderboard';
 import { Login } from '@/src/pages/Login';
+import { Matches } from '@/src/pages/Matches';
 import { Players } from '@/src/pages/Players/Players';
 import { Profile } from '@/src/pages/Profile';
 import { ProfileDetails } from '@/src/pages/ProfileDetails';
@@ -24,6 +24,7 @@ import { TeamDetails } from '@/src/pages/TeamDetails';
 import { TeamEdit } from '@/src/pages/TeamEdit';
 import { Teams } from '@/src/pages/Teams';
 import { TournamentDetails } from '@/src/pages/TournamentDetails';
+import { Tournaments } from '@/src/pages/Tournaments';
 import { useAuthStore } from '@/src/store/authStore';
 
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -40,7 +41,7 @@ const router = createBrowserRouter(
 	createRoutesFromElements(
 		<>
 			<Route element={<MainLayout />}>
-				<Route path={RoutePaths.Home} element={<Home />} />
+				<Route path={RoutePaths.Home} element={<Tournaments />} />
 				<Route path={RoutePaths.Games} element={<Games />} />
 
 				<Route path={RoutePaths.TournamentDetails} element={<TournamentDetails />} />
@@ -54,6 +55,8 @@ const router = createBrowserRouter(
 				<Route path={RoutePaths.ProfileDetails} element={<ProfileDetails />} />
 
 				<Route path={RoutePaths.Players} element={<Players />} />
+
+				<Route path={RoutePaths.Matches} element={<Matches />} />
 			</Route>
 
 			<Route element={<MainLayout withHeader={false} />}>

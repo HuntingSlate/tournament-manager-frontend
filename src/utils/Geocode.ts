@@ -7,7 +7,7 @@ type GeocodeHandler = (coords: { lat: number; lon: number }) => void;
 
 export const useAutoGeocode = (addressParts: string[], onGeocode: GeocodeHandler) => {
 	const fullAddress = addressParts.filter(Boolean).join(', ');
-	const [debouncedAddress] = useDebouncedValue(fullAddress, 1000);
+	const [debouncedAddress] = useDebouncedValue(fullAddress, 1500);
 	const lastAddress = useRef<string | null>(null);
 
 	useEffect(() => {

@@ -16,10 +16,10 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 import z from 'zod';
 
+import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
 import type { TeamLink as TeamLinkType } from '@/src/api/team';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
-import { useGamesQuery } from '@/src/pages/Games/games.utils';
 import { useGetTeamDetailsQuery } from '@/src/pages/TeamDetails/teamDetails.utils';
 import { AddLinkModal } from '@/src/pages/TeamEdit/components/AddLinkModal';
 import { AddMemberModal } from '@/src/pages/TeamEdit/components/AddMemberModal';
@@ -46,7 +46,7 @@ export const TeamEdit: FC = () => {
 	const userId = useAuthStore((state) => state.user?.id);
 
 	const { data: teamDetails } = useGetTeamDetailsQuery(id!);
-	const { data: gamesData } = useGamesQuery();
+	const { data: gamesData } = useGetGamesQuery();
 	const { mutate: updateTeamMutation, isPending: isUpdating } = useEditTeamMutation();
 
 	const [editingLink, setEditingLink] = useState<TeamLinkType | null>(null);

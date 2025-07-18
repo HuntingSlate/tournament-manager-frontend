@@ -1,3 +1,4 @@
+import type { TournamentApplication } from '@/src/api/tournament';
 import { api } from '@/src/utils/AxiosInstance';
 
 export type TeamLink = {
@@ -104,5 +105,12 @@ export const applyTeamToTournament = async (
 	tournamentId: number
 ): Promise<Team> => {
 	const { data } = await api.post<Team>(`/teams/${teamId}/apply/${tournamentId}`);
+	return data;
+};
+
+export const getTeamTournamentApplications = async (
+	teamId: number
+): Promise<TournamentApplication[]> => {
+	const { data } = await api.get<TournamentApplication[]>(`/teams/${teamId}/applications`);
 	return data;
 };

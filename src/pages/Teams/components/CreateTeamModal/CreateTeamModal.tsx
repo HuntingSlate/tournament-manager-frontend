@@ -5,7 +5,7 @@ import { Button, Group, Input, InputWrapper, Modal, Select, Stack } from '@manti
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
-import { useGamesQuery } from '@/src/pages/Games/games.utils';
+import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
 import { useCreateTeamMutation } from '@/src/pages/Teams/components/CreateTeamModal/createTeamModal.utils';
 
 type CreateTeamModalProps = {
@@ -29,7 +29,7 @@ const createTeamSchema = z.object({
 type CreateTeamFormValues = z.infer<typeof createTeamSchema>;
 
 export const CreateTeamModal: FC<CreateTeamModalProps> = ({ isOpen, onClose }) => {
-	const { data, isLoading } = useGamesQuery();
+	const { data, isLoading } = useGetGamesQuery();
 	const { mutate, isPending } = useCreateTeamMutation();
 
 	const methods = useForm<CreateTeamFormValues>({

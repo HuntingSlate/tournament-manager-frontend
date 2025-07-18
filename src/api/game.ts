@@ -6,8 +6,8 @@ export type Game = {
 	imageUrl?: string;
 };
 
-export const getGames = async (): Promise<Game[]> => {
-	const { data } = await api.get<Game[]>('/games');
+export const getGames = async (name: string): Promise<Game[]> => {
+	const { data } = await api.get<Game[]>('/games', { params: { name } });
 	return data;
 };
 

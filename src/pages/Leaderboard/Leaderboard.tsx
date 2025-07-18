@@ -1,19 +1,21 @@
-import { Group, Loader, Select, Stack, Title, Text } from '@mantine/core';
+import { Group, Loader, Select, Stack, Title, Text, Flex, Pagination } from '@mantine/core';
 import { useEffect, useState, type FC } from 'react';
 import { useParams } from 'react-router';
 
+import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
+import { useGetPlayerRankingByGameIdQuery } from '@/src/api/mutations/leaderboardMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
-import { useGamesQuery } from '@/src/pages/Games/games.utils';
 import { LeaderboardPlayerCard } from '@/src/pages/Leaderboard/components/LeaderboardPlayerCard';
-import { usePlayerRankingQuery } from '@/src/pages/Leaderboard/leaderboard.utils';
 
+const PAGE_SIZE = 6;
 export const Leaderboard: FC = () => {
 	const { id } = useParams<{ id: string }>();
 
 	const [selectedGame, setSelectedGame] = useState<string | null>(null);
-	const { data: games, isLoading: isGamesLoading } = useGamesQuery();
+	const [activePage, setActivePage] = useState(1);
+	const { data: games, isLoading: isGamesLoading } = useGetGamesQuery();
 
-	const { data: rankings, isLoading: isRankingsLoading } = usePlayerRankingQuery(
+	const { data: rankings, isLoading: isRankingsLoading } = useGetPlayerRankingByGameIdQuery(
 		selectedGame ? Number(selectedGame) : null
 	);
 
@@ -30,6 +32,16 @@ export const Leaderboard: FC = () => {
 			value: game.id.toString(),
 			label: game.name,
 		})) || [];
+
+	useEffect(() => {
+		setActivePage(1);
+	}, [selectedGame]);
+
+	const paginatedData = rankings
+		? rankings.slice((activePage - 1) * PAGE_SIZE, activePage * PAGE_SIZE)
+		: [];
+
+	const totalPages = rankings ? Math.ceil(rankings.length / PAGE_SIZE) : 0;
 
 	return (
 		<PageLayout>
@@ -48,23 +60,31 @@ export const Leaderboard: FC = () => {
 					searchable
 				/>
 			</Group>
-			<Group style={{ justifyContent: 'space-between' }}></Group>
-			{isRankingsLoading ? (
-				<Group style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-					<Loader color='blue' />
-				</Group>
-			) : (
-				<Stack>
-					{rankings && rankings.length > 0 ? (
-						rankings.map((player) => (
+			<Flex direction='column' justify='space-between' h='100%' style={{ flexGrow: 1 }}>
+				<Stack gap='md'>
+					{isRankingsLoading ? (
+						<Flex justify='center' align='center' h='100%'>
+							<Loader color='blue' />
+						</Flex>
+					) : paginatedData.length > 0 ? (
+						paginatedData.map((player) => (
 							<LeaderboardPlayerCard key={player.id} playerRanking={player} />
 						))
 					) : (
 						<Text c='dimmed' ta='center' mt='xl'>
-							No ranking data available for this game.
+							No data.
 						</Text>
 					)}
 				</Stack>
+			</Flex>
+			{totalPages > 1 && (
+				<Pagination
+					total={totalPages}
+					value={activePage}
+					onChange={setActivePage}
+					mt='xl'
+					style={{ alignSelf: 'center' }}
+				/>
 			)}
 		</PageLayout>
 	);

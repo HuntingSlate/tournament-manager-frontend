@@ -12,24 +12,41 @@ L.Icon.Default.mergeOptions({
 	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const MapFlyTo: FC<{ position: [number, number] }> = ({ position }) => {
+const MapViewUpdater: FC<{ position: [number, number] }> = ({ position }) => {
 	const map = useMap();
 	useEffect(() => {
-		map.flyTo(position, 15);
+		map.setView(position, 15);
 	}, [position, map]);
 	return null;
 };
 
-export const TournamentMap: FC<{ position: [number, number] }> = ({ position }) => {
+export type TournamentMapProps = {
+	position: [number, number] | null;
+};
+
+export const TournamentMap: FC<TournamentMapProps> = ({ position }) => {
+	const defaultCenter: [number, number] = [52.237, 21.017];
+	const mapCenter = position || defaultCenter;
+	const zoomLevel = position ? 13 : 6;
+
 	return (
 		<Box>
-			<MapContainer center={position} zoom={13} style={{ height: 360, width: '100%' }}>
+			<MapContainer
+				center={mapCenter}
+				zoom={zoomLevel}
+				style={{ height: 360, width: '100%', zIndex: 0 }}
+			>
 				<TileLayer
 					url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+					updateWhenIdle={true}
 				/>
-				<Marker position={position} />
-				<MapFlyTo position={position} />
+				{position && (
+					<>
+						<Marker position={position} />
+						<MapViewUpdater position={position} />
+					</>
+				)}
 			</MapContainer>
 		</Box>
 	);

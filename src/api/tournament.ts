@@ -6,19 +6,23 @@ export type Tournament = {
 	description: string;
 	startDate: string;
 	endDate: string;
-	gameId: number;
 	gameName: string;
+	gameId: number;
 	organizerId: number;
 	organizerNickname: string;
 	postalCode: string;
 	city: string;
 	street: string;
 	buildingNumber: number;
-	longitude: number;
 	latitude: number;
+	longitude: number;
 	maxTeams: number;
 	currentTeams: number;
 	status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELED';
+	participatingTeams: Array<{
+		id: number;
+		name: string;
+	}>;
 	lanTournament: boolean;
 };
 
@@ -37,7 +41,8 @@ export type TournamentSearchParams = {
 	location?: string;
 	startDate?: string;
 	endDate?: string;
-	organizerNickname?: string;
+	gameName?: string;
+	status?: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 };
 
 export const getTournaments = async (params: TournamentSearchParams): Promise<Tournament[]> => {

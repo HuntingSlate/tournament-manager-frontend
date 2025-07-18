@@ -13,11 +13,13 @@ import {
 import { IconChevronLeft } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router';
 
+import { useGetTeamTournamentApplicationsQuery } from '@/src/api/mutations/teamMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { TeamLinks } from '@/src/pages/TeamDetails/components/TeamLinks';
 import { TeamMember } from '@/src/pages/TeamDetails/components/TeamMember';
 import { TeamTournament } from '@/src/pages/TeamDetails/components/TeamTournament/TeamTournament';
+import { TeamTournamentApplications } from '@/src/pages/TeamDetails/components/TeamTournamentApplications';
 import { useGetTeamDetailsQuery } from '@/src/pages/TeamDetails/teamDetails.utils';
 import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
@@ -36,6 +38,9 @@ export const TeamDetails = () => {
 	const isAdmin = useAuthStore((state) => state.isAdmin());
 	const isTeamLeader = userId === data?.leaderId;
 
+	const { data: tournamentApplications, isLoading: isTournamentApplicationsLoading } =
+		useGetTeamTournamentApplicationsQuery(id!, isTeamLeader || isAdmin);
+
 	return (
 		<PageLayout>
 			<Group pb={16} w='100%' justify='space-between'>
@@ -51,7 +56,7 @@ export const TeamDetails = () => {
 					</Button>
 				)}
 			</Group>
-			{isLoading ? (
+			{isLoading && isTournamentApplicationsLoading ? (
 				<Flex justify='center' align='center' h='100%'>
 					<Loader color='blue' />
 				</Flex>
@@ -105,6 +110,9 @@ export const TeamDetails = () => {
 							/>
 						))}
 					</Stack>
+					{(isTeamLeader || isAdmin) && (
+						<TeamTournamentApplications applications={tournamentApplications} />
+					)}
 				</Stack>
 			)}
 		</PageLayout>
