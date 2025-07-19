@@ -101,8 +101,9 @@ export const TeamEdit: FC = () => {
 	};
 
 	const isTeamLocked =
-		teamDetails?.tournaments?.some((t) => t.status === 'ACTIVE' || t.status === 'COMPLETED') ??
-		false;
+		teamDetails?.tournaments?.some(
+			(t) => t.tournamentStatus === 'ACTIVE' || t.tournamentStatus === 'COMPLETED'
+		) ?? false;
 
 	const handleEditLinkClick = (link: TeamLinkType) => {
 		setEditingLink(link);

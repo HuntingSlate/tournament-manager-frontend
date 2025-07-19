@@ -30,14 +30,14 @@ export const useGetProfileByIdQuery = (id: string) => {
 
 export const useGetProfileLinksQuery = () => {
 	return useQuery({
-		queryKey: ['user-profile-links'],
+		queryKey: ['user-profile'],
 		queryFn: getProfileLinks,
 	});
 };
 
 export const useGetProfileTeamsQuery = () => {
 	return useQuery({
-		queryKey: ['user-profile-teams'],
+		queryKey: ['user-profile'],
 		queryFn: () => getUserTeams(),
 	});
 };
@@ -71,7 +71,7 @@ export const useAddProfileLinkMutation = () => {
 	return useMutation({
 		mutationFn: addProfileLink,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['user-profile-links'] });
+			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
 			console.error(error);
@@ -86,7 +86,7 @@ export const useUpdateProfileLinkMutation = () => {
 		mutationFn: ({ linkId, linkData }: { linkId: number; linkData: AddProfileLinkData }) =>
 			updateProfileLink(linkId, linkData),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['user-profile-links'] });
+			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
 			console.error(error);
@@ -100,7 +100,7 @@ export const useRemoveProfileLinkMutation = () => {
 	return useMutation({
 		mutationFn: ({ linkId }: { linkId: number }) => removeProfileLink(linkId),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['user-profile-links'] });
+			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
 			console.error(error);

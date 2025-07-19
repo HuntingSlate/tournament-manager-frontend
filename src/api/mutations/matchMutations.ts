@@ -9,7 +9,7 @@ import type {
 } from '@/src/api/match';
 import {
 	createMatch,
-	createMatchPlayerStatistics,
+	updateMatchPlayerStatistics,
 	deleteMatch,
 	getMatches,
 	getTournamentMatches,
@@ -117,18 +117,20 @@ export const useDeleteMatchMutation = () => {
 	});
 };
 
-export const useCreateMatchPlayerStatisticsMutation = () => {
+export const useUpdateMatchPlayerStatisticsMutation = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: ({
 			id,
+			statisticId,
 			statistics,
 		}: {
 			id: number;
+			statisticId: number;
 			statistics: PlayerMatchStatistics;
 			tournamentId: number;
-		}) => createMatchPlayerStatistics(id, statistics),
+		}) => updateMatchPlayerStatistics(id, statisticId, statistics),
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: ['tournament-matches', variables.tournamentId],
@@ -136,7 +138,7 @@ export const useCreateMatchPlayerStatisticsMutation = () => {
 		},
 		onError: (error: any) => {
 			notifications.show({
-				title: 'Player Statistics Creation Error',
+				title: 'Player Statistics Update Error',
 				message: error.response?.data?.message,
 				color: 'red',
 				autoClose: 5000,

@@ -24,8 +24,10 @@ export const TournamentDetails: FC = () => {
 	const userId = useAuthStore((state) => state.user?.id);
 	const { data, isLoading } = useGetTournamentByIdQuery(id!);
 	const isOrganizer = userId === data?.organizerId;
-	const { data: tournamentApplications, isLoading: isApplicationsLoading } =
-		useGetTournamentApplicationsQuery(id!, isOrganizer || isAdmin);
+	const { data: tournamentApplications } = useGetTournamentApplicationsQuery(
+		id!,
+		isOrganizer || isAdmin
+	);
 	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
 	const canJoinTeam =
@@ -59,7 +61,7 @@ export const TournamentDetails: FC = () => {
 						{canGoToMatches && (
 							<Button
 								variant='subtle'
-								onClick={() => navigate(RoutePaths.MatchDetails.replace(':id', id!))}
+								onClick={() => navigate(RoutePaths.TournamentLadder.replace(':id', id!))}
 							>
 								Ladder
 							</Button>
@@ -74,7 +76,7 @@ export const TournamentDetails: FC = () => {
 						)}
 					</Group>
 				</Group>
-				{isLoading || isApplicationsLoading ? (
+				{isLoading ? (
 					<Flex justify='center' align='center' h='100%'>
 						<Loader color='blue' />
 					</Flex>

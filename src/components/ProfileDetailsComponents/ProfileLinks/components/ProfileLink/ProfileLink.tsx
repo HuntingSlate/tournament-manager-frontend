@@ -18,8 +18,8 @@ export const ProfileLink: FC<ProfileLinkProps> = ({ type, url, platformUsername 
 	return (
 		<Group p={16} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de' justify='space-between'>
 			<Group gap={12}>
-				<Flex style={{ padding: 12, backgroundColor: vars.colors.gray[4], borderRadius: '50%' }}>
-					<IconLink size={32} />
+				<Flex style={{ padding: 8, backgroundColor: vars.colors.gray[4], borderRadius: '50%' }}>
+					<IconLink size={20} />
 				</Flex>
 				<Stack gap={0}>
 					<Group>

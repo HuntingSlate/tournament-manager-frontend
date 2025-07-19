@@ -3,13 +3,10 @@ import { useState, type FC } from 'react';
 
 import type { Match } from '@/src/api/match';
 import { MatchDetailsModal } from '@/src/components/TournamentBracket/components/MatchDetailsModal';
+import { MatchEditModal } from '@/src/components/TournamentBracket/components/MatchEditModal';
 import { MatchCard } from '@/src/components/TournamentBracket/MatchCard';
 import { PlaceholderCard } from '@/src/components/TournamentBracket/PlaceholderCard';
 import '@/src/components/TournamentBracket/TournamentBracket.css';
-
-export type TournamentBracketProps = {
-	matches: Match[];
-};
 
 const generateFullBracket = (apiMatches: Match[]): (Match | null)[][] => {
 	if (!apiMatches || apiMatches.length === 0) {
@@ -52,13 +49,23 @@ const generateFullBracket = (apiMatches: Match[]): (Match | null)[][] => {
 	return fullBracket;
 };
 
-export const TournamentBracket: FC<TournamentBracketProps> = ({ matches }) => {
+export type TournamentBracketProps = {
+	matches: Match[];
+	canEditMatch?: boolean;
+};
+
+export const TournamentBracket: FC<TournamentBracketProps> = ({ matches, canEditMatch }) => {
 	const fullBracket = generateFullBracket(matches);
 	const [isMatchDetailsModalOpen, setIsMatchDetailsModalOpen] = useState(false);
+	const [isEditMatchModalOpen, setIsEditMatchModalOpen] = useState(false);
 	const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
 	const handleSelectMatch = (match: Match) => {
 		setSelectedMatch(match);
+		if (canEditMatch) {
+			setIsEditMatchModalOpen(true);
+			return;
+		}
 		setIsMatchDetailsModalOpen(true);
 	};
 
@@ -74,11 +81,7 @@ export const TournamentBracket: FC<TournamentBracketProps> = ({ matches }) => {
 						<div className='matches-container'>
 							{round.map((match, matchIndex) =>
 								match ? (
-									<MatchCard
-										key={match.id}
-										match={match}
-										onClick={() => handleSelectMatch(match)}
-									/>
+									<MatchCard key={match.id} match={match} onClick={handleSelectMatch} />
 								) : (
 									<PlaceholderCard key={`placeholder-${roundIndex}-${matchIndex}`} />
 								)
@@ -87,13 +90,19 @@ export const TournamentBracket: FC<TournamentBracketProps> = ({ matches }) => {
 					</div>
 				))}
 			</Box>
-			{selectedMatch && (
+			{selectedMatch && canEditMatch ? (
+				<MatchEditModal
+					isOpen={isEditMatchModalOpen}
+					onClose={() => setIsEditMatchModalOpen(false)}
+					match={selectedMatch}
+				/>
+			) : selectedMatch ? (
 				<MatchDetailsModal
 					isOpen={isMatchDetailsModalOpen}
 					onClose={() => setIsMatchDetailsModalOpen(false)}
 					match={selectedMatch}
 				/>
-			)}
+			) : null}
 		</>
 	);
 };

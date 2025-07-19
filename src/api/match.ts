@@ -28,7 +28,7 @@ export type Match = {
 	secondTeamName: string;
 	startDatetime: Date;
 	endDatetime: Date;
-	winningTeamId: number;
+	winningTeamId: number | null;
 	winningTeamName: string;
 	bracketLevel: number;
 	matchNumberInRound: number;
@@ -68,11 +68,12 @@ export const createMatch = async (match: Match): Promise<Match> => {
 	return data;
 };
 
-export const createMatchPlayerStatistics = async (
+export const updateMatchPlayerStatistics = async (
 	id: number,
+	statisticId: number,
 	statistics: PlayerMatchStatistics
 ): Promise<Match> => {
-	const { data } = await api.post<Match>(`/matches/${id}/statistics`, statistics);
+	const { data } = await api.put<Match>(`/matches/${id}/statistics/${statisticId}`, statistics);
 	return data;
 };
 

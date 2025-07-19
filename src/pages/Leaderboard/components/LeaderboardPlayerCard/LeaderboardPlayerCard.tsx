@@ -24,8 +24,8 @@ export const LeaderboardPlayerCard: FC<LeaderboardPlayerCardProps> = ({ playerRa
 			justify='space-between'
 		>
 			<Group gap={12} w='200px'>
-				<Flex p={12} bg={vars.colors.blue[1]} bdrs='50%'>
-					<IconUser size={32} />
+				<Flex p={8} bg={vars.colors.blue[1]} bdrs='50%'>
+					<IconUser size={20} />
 				</Flex>
 				<Text size='md' fw={600}>
 					{playerRanking.playerNickname}

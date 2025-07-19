@@ -1,20 +1,24 @@
-import type { FC } from 'react';
-
 import { ActionIcon, Flex, Group, Loader, Title } from '@mantine/core';
 import { IconChevronLeft } from '@tabler/icons-react';
+import { type FC } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { useGetTournamentMatchesQuery } from '@/src/api/mutations/matchMutations';
+import { useGetTournamentByIdQuery } from '@/src/api/mutations/tournamentMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { TournamentBracket } from '@/src/components/TournamentBracket';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
+import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
 
 export const MatchDetails: FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-
+	const userId = useAuthStore((state) => state.user?.id);
+	const isAdmin = useAuthStore((state) => state.isAdmin());
 	const { data, isLoading } = useGetTournamentMatchesQuery(Number(id));
+	const { data: tournamentData } = useGetTournamentByIdQuery(id!);
+	const canEditMatch = userId === tournamentData?.organizerId || isAdmin;
 
 	if (isLoading) {
 		return (
@@ -42,7 +46,7 @@ export const MatchDetails: FC = () => {
 				</Group>
 			</Group>
 			<Flex p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
-				<TournamentBracket matches={data || []} />
+				<TournamentBracket matches={data || []} canEditMatch={canEditMatch} />
 			</Flex>
 		</PageLayout>
 	);
