@@ -11,7 +11,7 @@ import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
 
-export const MatchDetails: FC = () => {
+export const TournamentLadder: FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const userId = useAuthStore((state) => state.user?.id);

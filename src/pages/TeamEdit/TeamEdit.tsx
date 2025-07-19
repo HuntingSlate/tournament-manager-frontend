@@ -21,6 +21,7 @@ import {
 	useDeleteTeamMutation,
 	useEditTeamMutation,
 	useGetTeamDetailsQuery,
+	useGetTeamTournamentApplicationsQuery,
 } from '@/src/api/mutations/teamMutations';
 import type { TeamLink as TeamLinkType } from '@/src/api/team';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
@@ -30,6 +31,8 @@ import { AddMemberModal } from '@/src/pages/TeamEdit/components/AddMemberModal';
 import { EditLinkModal } from '@/src/pages/TeamEdit/components/EditLinkModal';
 import { TeamLink } from '@/src/pages/TeamEdit/components/TeamLink';
 import { TeamMember } from '@/src/pages/TeamEdit/components/TeamMember';
+import { TeamTournamentApplications } from '@/src/pages/TeamEdit/components/TeamTournamentApplications';
+import { TeamTournament } from '@/src/pages/TeamEdit/components/TeamTournaments';
 import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
 
@@ -47,11 +50,16 @@ export const TeamEdit: FC = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const userId = useAuthStore((state) => state.user?.id);
+	const isAdmin = useAuthStore((state) => state.isAdmin());
 
 	const { data: teamDetails } = useGetTeamDetailsQuery(id!);
 	const { data: gamesData } = useGetGamesQuery();
 	const { mutate: updateTeamMutation, isPending: isUpdating } = useEditTeamMutation();
 	const { mutate: deleteTeamMutation, isPending: isDeleting } = useDeleteTeamMutation();
+	const { data: tournamentApplications } = useGetTeamTournamentApplicationsQuery(
+		id!,
+		userId === teamDetails?.leaderId || isAdmin
+	);
 
 	const [editingLink, setEditingLink] = useState<TeamLinkType | null>(null);
 	const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
@@ -239,6 +247,23 @@ export const TeamEdit: FC = () => {
 									))}
 								</Stack>
 							</Stack>
+							<Stack p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
+								<Group justify='space-between'>
+									<Text size='lg' fw={500}>
+										Team Tournaments ({teamDetails?.tournaments.length || 0})
+									</Text>
+								</Group>
+								{teamDetails?.tournaments?.map((tournament) => (
+									<TeamTournament
+										teamId={teamDetails.id}
+										key={tournament.tournamentId}
+										tournamentId={tournament.tournamentId}
+										status={tournament.tournamentStatus}
+										tournamentName={tournament.tournamentName}
+									/>
+								))}
+							</Stack>
+							<TeamTournamentApplications applications={tournamentApplications} />
 							<Group justify='flex-end'>
 								<Button
 									variant='filled'

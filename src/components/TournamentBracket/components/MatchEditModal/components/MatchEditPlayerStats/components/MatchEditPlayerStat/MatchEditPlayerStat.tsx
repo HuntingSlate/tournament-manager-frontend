@@ -11,7 +11,7 @@ import {
 	IconX,
 	IconPencil,
 } from '@tabler/icons-react';
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import z from 'zod';
@@ -47,6 +47,14 @@ export const MatchEditPlayerStat: FC<MatchEditPlayerStatProps> = ({ stat, bg, ma
 			assists: stat.assists,
 		},
 	});
+
+	useEffect(() => {
+		methods.reset({
+			kills: stat.kills,
+			deaths: stat.deaths,
+			assists: stat.assists,
+		});
+	}, [stat, methods]);
 
 	const handleCancel = () => {
 		methods.reset();

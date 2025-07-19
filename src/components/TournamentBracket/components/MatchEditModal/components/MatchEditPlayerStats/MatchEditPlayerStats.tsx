@@ -6,11 +6,11 @@ import { MatchEditPlayerStat } from '@/src/components/TournamentBracket/componen
 import { vars } from '@/src/theme';
 
 type MatchEditPlayerStatsProps = {
-	matchId: number;
-	firstTeamName: string;
-	secondTeamName: string;
-	firstTeamStats: Match['firstTeamMatchStatistics'];
-	secondTeamStats: Match['secondTeamMatchStatistics'];
+	matchId?: number;
+	firstTeamName?: string;
+	secondTeamName?: string;
+	firstTeamStats?: Match['firstTeamMatchStatistics'];
+	secondTeamStats?: Match['secondTeamMatchStatistics'];
 };
 
 export const MatchEditPlayerStats: FC<MatchEditPlayerStatsProps> = ({
@@ -27,10 +27,10 @@ export const MatchEditPlayerStats: FC<MatchEditPlayerStatsProps> = ({
 					{firstTeamName}
 				</Text>
 				<Stack gap={6}>
-					{firstTeamStats.map((stat) => (
+					{firstTeamStats?.map((stat) => (
 						<MatchEditPlayerStat
 							key={stat.id}
-							matchId={matchId}
+							matchId={matchId!}
 							stat={stat}
 							bg={vars.colors.blue[0]}
 						/>
@@ -42,10 +42,10 @@ export const MatchEditPlayerStats: FC<MatchEditPlayerStatsProps> = ({
 					{secondTeamName}
 				</Text>
 				<Stack gap={6}>
-					{secondTeamStats.map((stat) => (
+					{secondTeamStats?.map((stat) => (
 						<MatchEditPlayerStat
 							key={stat.id}
-							matchId={matchId}
+							matchId={matchId!}
 							stat={stat}
 							bg={vars.colors.red[0]}
 						/>

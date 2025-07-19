@@ -15,7 +15,15 @@ import {
 	getTournamentMatches,
 	recordMatchResult,
 	updateMatch,
+	getMatchById,
 } from '@/src/api/match';
+
+export const useGetMatchByIdQuery = (id: number) => {
+	return useQuery({
+		queryKey: ['match', id],
+		queryFn: () => getMatchById(id),
+	});
+};
 
 export const useGetTournamentMatchesQuery = (tournamentId: number) => {
 	return useQuery({
@@ -81,6 +89,7 @@ export const useUpdateMatchMutation = () => {
 	return useMutation({
 		mutationFn: ({ id, match }: { id: number; match: Match }) => updateMatch(id, match),
 		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['match', data.id] });
 			queryClient.invalidateQueries({
 				queryKey: ['tournament-matches', data.tournamentId],
 			});
@@ -132,6 +141,7 @@ export const useUpdateMatchPlayerStatisticsMutation = () => {
 			tournamentId: number;
 		}) => updateMatchPlayerStatistics(id, statisticId, statistics),
 		onSuccess: (_, variables) => {
+			queryClient.invalidateQueries({ queryKey: ['match', variables.id] });
 			queryClient.invalidateQueries({
 				queryKey: ['tournament-matches', variables.tournamentId],
 			});

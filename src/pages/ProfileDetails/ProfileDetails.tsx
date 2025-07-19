@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import { useGetProfileByIdQuery } from '@/src/api/mutations/userMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
+import { ProfileDetailsGamesStatistics } from '@/src/components/ProfileDetailsComponents/ProfileDetailsGamesStatistics';
 import { ProfileInformation } from '@/src/components/ProfileDetailsComponents/ProfileInformation';
 import { ProfileLinks } from '@/src/components/ProfileDetailsComponents/ProfileLinks';
 import { ProfileTeams } from '@/src/components/ProfileDetailsComponents/ProfileTeams';
@@ -29,6 +30,7 @@ export const ProfileDetails: FC = () => {
 			<ProfileInformation email={data?.email} fullName={data?.fullName} nickname={data?.nickname} />
 			<ProfileLinks links={data?.links} />
 			<ProfileTeams teams={data?.teams} />
+			<ProfileDetailsGamesStatistics />
 		</PageLayout>
 	);
 };

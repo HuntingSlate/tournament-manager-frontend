@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { useGetUserProfileQuery } from '@/src/api/mutations/userMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
+import { ProfileGamesStatistics } from '@/src/components/ProfileDetailsComponents/ProfileGamesStatistics';
 import { ProfileInformation } from '@/src/components/ProfileDetailsComponents/ProfileInformation';
 import { ProfileLinks } from '@/src/components/ProfileDetailsComponents/ProfileLinks';
 import { ProfileTeams } from '@/src/components/ProfileDetailsComponents/ProfileTeams';
@@ -45,6 +46,7 @@ export const Profile: FC = () => {
 			<ProfileInformation email={data?.email} fullName={data?.fullName} nickname={data?.nickname} />
 			<ProfileLinks links={data?.links} />
 			<ProfileTeams teams={data?.teams} />
+			<ProfileGamesStatistics />
 		</PageLayout>
 	);
 };

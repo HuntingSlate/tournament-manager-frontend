@@ -18,7 +18,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
 import type { Match, MatchStatus } from '@/src/api/match';
-import { useUpdateMatchMutation } from '@/src/api/mutations/matchMutations';
+import { useGetMatchByIdQuery, useUpdateMatchMutation } from '@/src/api/mutations/matchMutations';
 import { MatchEditPlayerStats } from '@/src/components/TournamentBracket/components/MatchEditModal/components/MatchEditPlayerStats';
 import { vars } from '@/src/theme';
 
@@ -47,36 +47,31 @@ type MatchEditModalProps = {
 };
 
 export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match }) => {
+	const { data: matchData } = useGetMatchByIdQuery(match.id);
 	const { mutate, isPending } = useUpdateMatchMutation();
 
 	const methods = useForm<MatchEditFormValues>({
 		resolver: zodResolver(editMatchSchema),
-		defaultValues: {
-			firstTeamScore: 0,
-			secondTeamScore: 0,
-			winningTeamId: null,
-			status: 'SCHEDULED',
-			startDatetime: new Date(),
-			endDatetime: new Date(),
-		},
 	});
 
 	useEffect(() => {
-		if (match && isOpen) {
+		if (matchData && isOpen) {
 			methods.reset({
-				firstTeamScore: match.firstTeamScore ?? 0,
-				secondTeamScore: match.secondTeamScore ?? 0,
-				status: match.status,
-				winningTeamId: match.winningTeamId ? String(match.winningTeamId) : null,
-				startDatetime: match.startDatetime ? new Date(match.startDatetime) : new Date(),
-				endDatetime: match.endDatetime ? new Date(match.endDatetime) : new Date(),
+				firstTeamScore: matchData.firstTeamScore ?? 0,
+				secondTeamScore: matchData.secondTeamScore ?? 0,
+				status: matchData.status,
+				winningTeamId: matchData.winningTeamId ? String(matchData.winningTeamId) : null,
+				startDatetime: matchData.startDatetime ? new Date(matchData.startDatetime) : new Date(),
+				endDatetime: matchData.endDatetime ? new Date(matchData.endDatetime) : new Date(),
 			});
 		}
-	}, [match, isOpen, methods]);
+	}, [matchData, isOpen, methods]);
 
 	const onSubmit = (data: MatchEditFormValues) => {
+		if (!matchData) return;
+
 		const updatedMatchData: Match = {
-			...match,
+			...matchData,
 			firstTeamScore: data.firstTeamScore,
 			secondTeamScore: data.secondTeamScore,
 			status: data.status,
@@ -84,7 +79,7 @@ export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match
 			endDatetime: data.endDatetime,
 			winningTeamId: data.winningTeamId ? Number(data.winningTeamId) : null,
 		};
-		mutate({ id: match.id, match: updatedMatchData });
+		mutate({ id: matchData.id, match: updatedMatchData });
 	};
 
 	const handleCancel = () => {
@@ -125,7 +120,7 @@ export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match
 												<IconUsers size={24} />
 											</Flex>
 											<Text style={{ textWrap: 'nowrap' }} size='lg' fw={500}>
-												{match.firstTeamName}
+												{matchData?.firstTeamName}
 											</Text>
 										</Group>
 										<Group wrap='nowrap' w='100%' justify='space-between' h='100%'>
@@ -139,8 +134,8 @@ export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match
 												/>
 												<Checkbox
 													label='Winner?'
-													checked={field.value === String(match.firstTeamId)}
-													onChange={() => handleWinnerChange(String(match.firstTeamId))}
+													checked={field.value === String(matchData?.firstTeamId)}
+													onChange={() => handleWinnerChange(String(matchData?.firstTeamId))}
 												/>
 											</Stack>
 											<Title order={1}>:</Title>
@@ -154,14 +149,14 @@ export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match
 												/>
 												<Checkbox
 													label='Winner?'
-													checked={field.value === String(match.secondTeamId)}
-													onChange={() => handleWinnerChange(String(match.secondTeamId))}
+													checked={field.value === String(matchData?.secondTeamId)}
+													onChange={() => handleWinnerChange(String(matchData?.secondTeamId))}
 												/>
 											</Stack>
 										</Group>
 										<Group wrap='nowrap' w='100%' gap={8} justify='flex-end'>
 											<Text style={{ textWrap: 'nowrap' }} size='lg' fw={500}>
-												{match.secondTeamName}
+												{matchData?.secondTeamName}
 											</Text>
 											<Flex p={12} bg={vars.colors.red[1]} bdrs='50%'>
 												<IconUsers size={24} />
@@ -224,11 +219,11 @@ export const MatchEditModal: FC<MatchEditModalProps> = ({ isOpen, onClose, match
 				</form>
 			</FormProvider>
 			<MatchEditPlayerStats
-				matchId={match.id}
-				firstTeamName={match.firstTeamName}
-				secondTeamName={match.secondTeamName}
-				firstTeamStats={match.firstTeamMatchStatistics}
-				secondTeamStats={match.secondTeamMatchStatistics}
+				matchId={matchData?.id}
+				firstTeamName={matchData?.firstTeamName}
+				secondTeamName={matchData?.secondTeamName}
+				firstTeamStats={matchData?.firstTeamMatchStatistics}
+				secondTeamStats={matchData?.secondTeamMatchStatistics}
 			/>
 		</Modal>
 	);

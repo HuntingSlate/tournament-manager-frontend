@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { ActionIcon, Flex, Group, Text } from '@mantine/core';
-import { IconTrophy } from '@tabler/icons-react';
+import { IconTrash, IconTrophy } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
 import type { TournamentApplication as TournamentApplicationType } from '@/src/api/tournament';
@@ -10,9 +10,15 @@ import { vars } from '@/src/theme';
 
 type TeamTournamentApplicationProps = {
 	application?: TournamentApplicationType;
+	onWithdrawClick?: () => void;
+	onWithdrawPending?: boolean;
 };
 
-export const TeamTournamentApplication: FC<TeamTournamentApplicationProps> = ({ application }) => {
+export const TeamTournamentApplication: FC<TeamTournamentApplicationProps> = ({
+	application,
+	onWithdrawClick,
+	onWithdrawPending,
+}) => {
 	const navigate = useNavigate();
 
 	return (
@@ -26,6 +32,14 @@ export const TeamTournamentApplication: FC<TeamTournamentApplicationProps> = ({ 
 				</Text>
 			</Group>
 			<Group>
+				<ActionIcon
+					variant='outline'
+					color='red'
+					onClick={onWithdrawClick}
+					loading={onWithdrawPending}
+				>
+					<IconTrash size={16} />
+				</ActionIcon>
 				<ActionIcon
 					variant='outline'
 					color='blue'

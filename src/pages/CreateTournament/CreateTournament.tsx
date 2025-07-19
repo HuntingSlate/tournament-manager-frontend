@@ -99,8 +99,11 @@ export const CreateTournament: FC = () => {
 			...data,
 			gameId: Number(data.gameId),
 			buildingNumber: Number(data.buildingNumber),
+			startDate: data.dateRange[0],
+			endDate: data.dateRange[1],
 			status: 'PENDING',
 		};
+
 		mutate(submissionData as any);
 	};
 

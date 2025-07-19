@@ -41,7 +41,7 @@ export const getPlayerStatisticsFromGame = async (
 
 export const getLoggedInPlayerFromGameStatistics = async (
 	gameId: number
-): Promise<GamePlayerRanking[]> => {
+): Promise<GamePlayerRanking> => {
 	const { data } = await api.get(`/statistics/player/${gameId}`);
 	return data;
 };
