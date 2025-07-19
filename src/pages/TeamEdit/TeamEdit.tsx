@@ -17,16 +17,19 @@ import { useNavigate, useParams } from 'react-router';
 import z from 'zod';
 
 import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
+import {
+	useDeleteTeamMutation,
+	useEditTeamMutation,
+	useGetTeamDetailsQuery,
+} from '@/src/api/mutations/teamMutations';
 import type { TeamLink as TeamLinkType } from '@/src/api/team';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
-import { useGetTeamDetailsQuery } from '@/src/pages/TeamDetails/teamDetails.utils';
 import { AddLinkModal } from '@/src/pages/TeamEdit/components/AddLinkModal';
 import { AddMemberModal } from '@/src/pages/TeamEdit/components/AddMemberModal';
 import { EditLinkModal } from '@/src/pages/TeamEdit/components/EditLinkModal';
 import { TeamLink } from '@/src/pages/TeamEdit/components/TeamLink';
 import { TeamMember } from '@/src/pages/TeamEdit/components/TeamMember';
-import { useEditTeamMutation } from '@/src/pages/TeamEdit/teamEdit.utils';
 import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
 
@@ -48,6 +51,7 @@ export const TeamEdit: FC = () => {
 	const { data: teamDetails } = useGetTeamDetailsQuery(id!);
 	const { data: gamesData } = useGetGamesQuery();
 	const { mutate: updateTeamMutation, isPending: isUpdating } = useEditTeamMutation();
+	const { mutate: deleteTeamMutation, isPending: isDeleting } = useDeleteTeamMutation();
 
 	const [editingLink, setEditingLink] = useState<TeamLinkType | null>(null);
 	const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
@@ -115,6 +119,14 @@ export const TeamEdit: FC = () => {
 		setEditingLink(null);
 	};
 
+	const handleDeleteTeam = () => {
+		deleteTeamMutation(Number(id), {
+			onSuccess: () => {
+				navigate(RoutePaths.Teams);
+			},
+		});
+	};
+
 	return (
 		<>
 			<PageLayout>
@@ -132,7 +144,13 @@ export const TeamEdit: FC = () => {
 									</ActionIcon>
 									<Title order={2}>Edit Team Details</Title>
 								</Group>
-								<Button variant='light' color='red' disabled={isTeamLocked}>
+								<Button
+									variant='light'
+									color='red'
+									disabled={isTeamLocked}
+									onClick={handleDeleteTeam}
+									loading={isDeleting}
+								>
 									Delete Team
 								</Button>
 							</Group>

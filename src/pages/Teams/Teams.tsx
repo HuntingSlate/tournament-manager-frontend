@@ -13,10 +13,10 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEffect, useState, type FC } from 'react';
 
+import { useSearchTeamsQuery } from '@/src/api/mutations/teamMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { CreateTeamModal } from '@/src/pages/Teams/components/CreateTeamModal';
 import { TeamCard } from '@/src/pages/Teams/components/TeamCard';
-import { useSearchTeamsQuery } from '@/src/pages/Teams/teams.utils';
 import { useAuthStore } from '@/src/store/authStore';
 
 const PAGE_SIZE = 5;

@@ -6,35 +6,44 @@ import type { Match } from '@/src/api/match';
 import '@/src/components/TournamentBracket/TournamentBracket.css';
 
 type MatchCardProps = {
-	match: Match;
-	onClick?: (match: Match) => void;
+	match: Partial<Match>;
+	onClick?: (match: Partial<Match>) => void;
 };
 
 export const MatchCard: FC<MatchCardProps> = ({ match, onClick }) => {
-	const getTeamClassName = (teamId: number) => {
-		if (match.status === 'COMPLETED' && match.winningTeamId === teamId) {
-			return 'team winner';
+	const isClickable = !!(match.firstTeamId && match.secondTeamId && onClick);
+
+	const getTeamClassName = (teamId?: number | null): string => {
+		if (!teamId) {
+			return 'team';
 		}
-		return 'team';
+
+		const isWinner =
+			match.status === 'COMPLETED' && match.winningTeamId != null && match.winningTeamId === teamId;
+
+		return isWinner ? 'team winner' : 'team';
 	};
 
 	return (
-		<Box className='match-card' onClick={() => onClick?.(match)}>
-			<div className='line-in'></div>
+		<Box
+			className='match-card'
+			onClick={isClickable ? () => onClick?.(match) : undefined}
+			style={{ cursor: isClickable ? 'pointer' : 'default' }}
+		>
 			<Box className={getTeamClassName(match.firstTeamId)}>
 				<Text className='team-name' size='sm'>
-					{match.firstTeamName}
+					{match.firstTeamName || 'TBD'}
 				</Text>
 				<Text className='team-score' fw={700}>
-					{match.firstTeamScore}
+					{match.firstTeamScore ?? ''}
 				</Text>
 			</Box>
 			<Box className={getTeamClassName(match.secondTeamId)}>
 				<Text className='team-name' size='sm'>
-					{match.secondTeamName}
+					{match.secondTeamName || 'TBD'}
 				</Text>
 				<Text className='team-score' fw={700}>
-					{match.secondTeamScore}
+					{match.secondTeamScore ?? ''}
 				</Text>
 			</Box>
 		</Box>

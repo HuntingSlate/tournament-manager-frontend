@@ -83,7 +83,7 @@ export const Games: FC = () => {
 									tournaments?.some((tournament) => tournament.gameId === game.id) ?? false;
 
 								return (
-									<GameCard key={game.id} game={game} isAdmin={isAdmin} isDeletable={isGameInUse} />
+									<GameCard key={game.id} game={game} isAdmin={isAdmin} isDeletable={!isGameInUse} />
 								);
 							})
 						) : (

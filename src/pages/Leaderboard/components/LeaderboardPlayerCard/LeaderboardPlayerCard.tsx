@@ -16,13 +16,7 @@ export const LeaderboardPlayerCard: FC<LeaderboardPlayerCardProps> = ({ playerRa
 	const navigate = useNavigate();
 
 	return (
-		<Group
-			p={'24px 16px'}
-			bdrs={4}
-			bg={vars.colors.white}
-			bd='1px solid #ced4de'
-			justify='space-between'
-		>
+		<Group p={16} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de' justify='space-between'>
 			<Group gap={12} w='200px'>
 				<Flex p={8} bg={vars.colors.blue[1]} bdrs='50%'>
 					<IconUser size={20} />

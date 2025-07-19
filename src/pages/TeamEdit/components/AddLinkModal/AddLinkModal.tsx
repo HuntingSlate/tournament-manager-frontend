@@ -5,7 +5,7 @@ import { Button, Group, Input, InputWrapper, Modal, Stack } from '@mantine/core'
 import { FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
-import { useCreateLinkMutation } from '@/src/pages/TeamEdit/teamEdit.utils';
+import { useCreateTeamLinkMutation } from '@/src/api/mutations/teamMutations';
 
 type AddLinkModalProps = {
 	isOpen: boolean;
@@ -22,7 +22,7 @@ const addTeamLinkSchema = z.object({
 type AddTeamLinkValues = z.infer<typeof addTeamLinkSchema>;
 
 export const AddLinkModal: FC<AddLinkModalProps> = ({ isOpen, onClose, teamId }) => {
-	const { mutate, isPending } = useCreateLinkMutation();
+	const { mutate, isPending } = useCreateTeamLinkMutation();
 
 	const methods = useForm<AddTeamLinkValues>({
 		resolver: zodResolver(addTeamLinkSchema),

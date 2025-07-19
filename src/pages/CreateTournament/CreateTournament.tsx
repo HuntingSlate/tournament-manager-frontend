@@ -8,8 +8,10 @@ import {
 	Textarea,
 	Title,
 	Select,
+	Text,
 	Button,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { IconChevronLeft } from '@tabler/icons-react';
 import { useState, type FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
@@ -17,10 +19,11 @@ import { useNavigate } from 'react-router';
 import z from 'zod';
 
 import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
+import { useCreateTournamentMutation } from '@/src/api/mutations/tournamentMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { TournamentMap } from '@/src/components/TournamentMap';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
-import { useCreateTournamentMutation } from '@/src/pages/CreateTournament/createTournament.utils';
+import { vars } from '@/src/theme';
 import { useAutoGeocode } from '@/src/utils/Geocode';
 
 const createTournamentSchema = z.object({
@@ -29,14 +32,11 @@ const createTournamentSchema = z.object({
 		.min(1, 'Tournament name is required')
 		.max(255, 'Tournament name must not exceed 255 characters'),
 	description: z.string().max(500, 'Description must not exceed 500 characters').optional(),
-	startDate: z
-		.string()
-		.min(1, 'Start date is required')
-		.regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' }),
-	endDate: z
-		.string()
-		.regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Date must be in YYYY-MM-DD format' })
-		.or(z.literal('')),
+	dateRange: z
+		.tuple([z.coerce.date().nullable(), z.coerce.date().nullable()])
+		.refine((val): val is [Date, Date] => !!val && val[0] !== null && val[1] !== null, {
+			message: 'Both start and end date are required.',
+		}),
 	gameId: z.string().min(1, { message: 'You must select a game.' }),
 	city: z.string().optional(),
 	street: z.string().optional(),
@@ -51,7 +51,6 @@ const createTournamentSchema = z.object({
 		}),
 	latitude: z.number().optional(),
 	longitude: z.number().optional(),
-	status: z.enum(['PENDING', 'ACTIVE', 'COMPLETED', 'CANCELED']),
 });
 
 type CreateTournamentFormValues = z.infer<typeof createTournamentSchema>;
@@ -67,15 +66,13 @@ export const CreateTournament: FC = () => {
 		defaultValues: {
 			name: '',
 			description: '',
-			startDate: '',
-			endDate: '',
+			dateRange: [null, null],
 			postalCode: '',
 			city: '',
 			gameId: '',
 			street: '',
 			buildingNumber: '',
 			maxTeams: 4,
-			status: 'PENDING',
 		},
 	});
 
@@ -89,24 +86,20 @@ export const CreateTournament: FC = () => {
 		}
 	);
 
+	const isAddressComplete = watchedAddress.every((value) => value && value.trim() !== '');
+
 	const selectGamesData =
 		games?.map((game) => ({
 			value: game.id.toString(),
 			label: game.name,
 		})) || [];
 
-	const statusData = [
-		{ value: 'PENDING', label: 'Pending' },
-		{ value: 'ACTIVE', label: 'Active' },
-		{ value: 'COMPLETED', label: 'Completed' },
-		{ value: 'CANCELED', label: 'Canceled' },
-	];
-
 	const onSubmit = (data: CreateTournamentFormValues) => {
 		const submissionData = {
 			...data,
 			gameId: Number(data.gameId),
 			buildingNumber: Number(data.buildingNumber),
+			status: 'PENDING',
 		};
 		mutate(submissionData as any);
 	};
@@ -115,181 +108,155 @@ export const CreateTournament: FC = () => {
 		<PageLayout>
 			<FormProvider {...methods}>
 				<form onSubmit={methods.handleSubmit(onSubmit)}>
-					<Stack style={{ gap: 16 }}>
-						<Group style={{ gap: 8 }}>
-							<ActionIcon
-								variant='transparent'
-								onClick={() => {
-									navigate(RoutePaths.Home);
-									methods.reset();
-								}}
-							>
-								<IconChevronLeft size={24} />
-							</ActionIcon>
-							<Title order={2}>Tournament Creation</Title>
+					<Stack gap={16}>
+						<Group justify='space-between'>
+							<Group>
+								<ActionIcon
+									variant='transparent'
+									onClick={() => {
+										navigate(RoutePaths.Home);
+										methods.reset();
+									}}
+								>
+									<IconChevronLeft size={24} />
+								</ActionIcon>
+								<Title order={2}>Tournament Creation</Title>
+							</Group>
+							<Group style={{ justifyContent: 'flex-end', marginTop: 16 }}>
+								<Button color='red' onClick={() => methods.reset()}>
+									Reset
+								</Button>
+								<Button type='submit' color='green' loading={isPending}>
+									Submit
+								</Button>
+							</Group>
 						</Group>
-						<Group style={{ flex: 1, alignItems: 'flex-start' }}>
-							<Stack style={{ flex: 1, gap: 16, alignContent: 'flex-start' }}>
+						<Stack p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
+							<Text size='lg' fw={500}>
+								Information
+							</Text>
+							<InputWrapper
+								size='sm'
+								label='Tournament Name'
+								error={methods.formState.errors.name?.message}
+							>
+								<Input size='md' placeholder='Type tournament name' {...methods.register('name')} />
+							</InputWrapper>
+							<InputWrapper
+								size='sm'
+								label='Description'
+								error={methods.formState.errors.description?.message}
+							>
+								<Textarea
+									size='md'
+									placeholder='Type description'
+									{...methods.register('description')}
+								/>
+							</InputWrapper>
+							<Group wrap='nowrap' w='100%'>
+								<Controller
+									name='dateRange'
+									control={methods.control}
+									render={({ field, fieldState }) => (
+										<InputWrapper label='Date Range' error={fieldState.error?.message} w='50%'>
+											<DatePickerInput
+												type='range'
+												placeholder='Select date range'
+												valueFormat='YYYY-MM-DD'
+												value={field.value as [Date | null, Date | null]}
+												onChange={(value) => field.onChange(value)}
+												size='md'
+											/>
+										</InputWrapper>
+									)}
+								/>
+								<Controller
+									name='gameId'
+									control={methods.control}
+									render={({ field, fieldState }) => (
+										<Select
+											label='Game'
+											placeholder='Select a game'
+											data={selectGamesData}
+											disabled={isGamesLoading}
+											style={{ width: '25%' }}
+											error={fieldState.error?.message}
+											searchable
+											{...field}
+											labelProps={{
+												style: { fontSize: '0.875rem', fontWeight: 500 },
+											}}
+											size='md'
+										/>
+									)}
+								/>
 								<InputWrapper
 									size='sm'
-									label='Tournament Name'
-									error={methods.formState.errors.name?.message}
+									label='Max Teams'
+									error={methods.formState.errors.maxTeams?.message}
+									style={{ width: '25%' }}
+								>
+									<Input
+										type='number'
+										size='md'
+										placeholder='Type max teams'
+										{...methods.register('maxTeams')}
+									/>
+								</InputWrapper>
+							</Group>
+						</Stack>
+						<Stack p={24} bdrs={4} bg={vars.colors.white} bd='1px solid #ced4de'>
+							<Text size='lg' fw={500}>
+								Location
+							</Text>
+							<Group wrap='nowrap'>
+								<InputWrapper
+									size='sm'
+									label='Street'
+									error={methods.formState.errors.street?.message}
+									style={{ width: '70%' }}
+								>
+									<Input size='md' placeholder='Type street' {...methods.register('street')} />
+								</InputWrapper>
+								<InputWrapper
+									size='sm'
+									label='Building Number'
+									error={methods.formState.errors.buildingNumber?.message}
+									style={{ width: '30%' }}
 								>
 									<Input
 										size='md'
-										placeholder='Type tournament name'
-										{...methods.register('name')}
+										type='number'
+										placeholder='Type building number'
+										{...methods.register('buildingNumber')}
 									/>
+								</InputWrapper>
+							</Group>
+							<Group wrap='nowrap'>
+								<InputWrapper
+									size='sm'
+									label='City'
+									error={methods.formState.errors.city?.message}
+									style={{ width: '100%' }}
+								>
+									<Input size='md' placeholder='Type city' {...methods.register('city')} />
 								</InputWrapper>
 								<InputWrapper
 									size='sm'
-									label='Description'
-									error={methods.formState.errors.description?.message}
+									label='Postal Code'
+									error={methods.formState.errors.postalCode?.message}
+									style={{ width: '100%' }}
 								>
-									<Textarea
+									<Input
 										size='md'
-										placeholder='Type description'
-										{...methods.register('description')}
+										placeholder='Type postal code'
+										{...methods.register('postalCode')}
 									/>
 								</InputWrapper>
-								<Group style={{ flexWrap: 'nowrap' }}>
-									<InputWrapper
-										size='sm'
-										label='Start Date'
-										error={methods.formState.errors.startDate?.message}
-										style={{ width: '100%' }}
-									>
-										<Input
-											size='md'
-											placeholder='Type start date (YYYY-MM-DD)'
-											{...methods.register('startDate')}
-										/>
-									</InputWrapper>
-									<InputWrapper
-										size='sm'
-										label='End Date'
-										error={methods.formState.errors.endDate?.message}
-										style={{ width: '100%' }}
-									>
-										<Input
-											size='md'
-											placeholder='Type end date (YYYY-MM-DD)'
-											{...methods.register('endDate')}
-										/>
-									</InputWrapper>
-								</Group>
-								<Group style={{ flexWrap: 'nowrap' }}>
-									<Controller
-										name='gameId'
-										control={methods.control}
-										render={({ field, fieldState }) => (
-											<Select
-												label='Game'
-												placeholder='Select a game'
-												data={selectGamesData}
-												disabled={isGamesLoading}
-												style={{ width: '50%' }}
-												error={fieldState.error?.message}
-												searchable
-												{...field}
-												labelProps={{
-													style: { fontSize: '0.875rem', fontWeight: 500 },
-												}}
-												size='md'
-											/>
-										)}
-									/>
-									<Controller
-										name='status'
-										control={methods.control}
-										render={({ field, fieldState }) => (
-											<Select
-												label='Tournament Status'
-												size='md'
-												style={{ width: '25%' }}
-												labelProps={{
-													style: { fontSize: '0.875rem', fontWeight: 500 },
-												}}
-												placeholder='Select a status'
-												data={statusData}
-												error={fieldState.error?.message}
-												{...field}
-											/>
-										)}
-									/>
-									<InputWrapper
-										size='sm'
-										label='Max Teams'
-										error={methods.formState.errors.maxTeams?.message}
-										style={{ width: '25%' }}
-									>
-										<Input
-											type='number'
-											size='md'
-											placeholder='Type max teams'
-											{...methods.register('maxTeams')}
-										/>
-									</InputWrapper>
-								</Group>
-							</Stack>
-							<Stack style={{ flex: 1 }}>
-								<Group style={{ flexWrap: 'nowrap' }}>
-									<InputWrapper
-										size='sm'
-										label='Street'
-										error={methods.formState.errors.street?.message}
-										style={{ width: '70%' }}
-									>
-										<Input size='md' placeholder='Type street' {...methods.register('street')} />
-									</InputWrapper>
-									<InputWrapper
-										size='sm'
-										label='Building Number'
-										error={methods.formState.errors.buildingNumber?.message}
-										style={{ width: '30%' }}
-									>
-										<Input
-											size='md'
-											type='number'
-											placeholder='Type building number'
-											{...methods.register('buildingNumber')}
-										/>
-									</InputWrapper>
-								</Group>
-								<Group style={{ flexWrap: 'nowrap' }}>
-									<InputWrapper
-										size='sm'
-										label='City'
-										error={methods.formState.errors.city?.message}
-										style={{ width: '100%' }}
-									>
-										<Input size='md' placeholder='Type city' {...methods.register('city')} />
-									</InputWrapper>
-									<InputWrapper
-										size='sm'
-										label='Postal Code'
-										error={methods.formState.errors.postalCode?.message}
-										style={{ width: '100%' }}
-									>
-										<Input
-											size='md'
-											placeholder='Type postal code'
-											{...methods.register('postalCode')}
-										/>
-									</InputWrapper>
-								</Group>
-								<TournamentMap position={mapPosition} />
-							</Stack>
-						</Group>
+							</Group>
+							{isAddressComplete && <TournamentMap position={mapPosition} />}
+						</Stack>
 					</Stack>
-					<Group style={{ justifyContent: 'flex-end', marginTop: 16 }}>
-						<Button color='red' onClick={() => methods.reset()}>
-							Reset
-						</Button>
-						<Button type='submit' color='green' loading={isPending}>
-							Submit
-						</Button>
-					</Group>
 				</form>
 			</FormProvider>
 		</PageLayout>

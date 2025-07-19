@@ -4,7 +4,7 @@ import { ActionIcon, Group } from '@mantine/core';
 import { IconLogin, IconLogout, IconUser } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 
-import { useLogout } from '@/src/components/layouts/MainLayout/components/Header/components/ProfileButtons/profileButtons.utils';
+import { useLogout } from '@/src/api/mutations/authMutations';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { useAuthStore } from '@/src/store/authStore';
 

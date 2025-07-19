@@ -60,10 +60,7 @@ export const useDeleteAccountMutation = () => {
 	return useMutation({
 		mutationFn: deleteAccount,
 		onSuccess: () => {
-			queryClient.removeQueries({ queryKey: ['user-profile'] });
-			queryClient.removeQueries({ queryKey: ['user-profile-links'] });
-			queryClient.removeQueries({ queryKey: ['user-teams'] });
-			queryClient.removeQueries({ queryKey: ['user-tournaments'] });
+			queryClient.clear();
 		},
 		onError: (error: any) => {
 			notifications.show({
@@ -75,4 +72,18 @@ export const useDeleteAccountMutation = () => {
 			});
 		},
 	});
+};
+
+export const useLogout = () => {
+	const queryClient = useQueryClient();
+	const logoutFromStore = useAuthStore((state) => state.logout);
+	const navigate = useNavigate();
+
+	const logout = () => {
+		logoutFromStore();
+		queryClient.clear();
+		navigate(RoutePaths.Login);
+	};
+
+	return logout;
 };

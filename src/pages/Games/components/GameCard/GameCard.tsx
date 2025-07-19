@@ -1,12 +1,18 @@
-import { ActionIcon, Button, Group, Title } from '@mantine/core';
-import { IconChartBarPopular, IconDeviceGamepad2, IconTournament } from '@tabler/icons-react';
+import { ActionIcon, Group, Title } from '@mantine/core';
+import {
+	IconChartBarPopular,
+	IconDeviceGamepad2,
+	IconPencil,
+	IconTournament,
+	IconTrash,
+} from '@tabler/icons-react';
 import { useState, type FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import type { Game } from '@/src/api/game';
+import { useDeleteGameMutation } from '@/src/api/mutations/gameMutations';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { EditGameModal } from '@/src/pages/Games/components/EditGameModal';
-import { useDeleteGameMutation } from '@/src/pages/Games/components/EditGameModal/editGameModal.utils';
 import { vars } from '@/src/theme';
 
 type GameCardProps = {
@@ -60,16 +66,27 @@ export const GameCard: FC<GameCardProps> = ({ game, isAdmin, isDeletable }) => {
 						<IconChartBarPopular size={16} />
 					</ActionIcon>
 					{isAdmin && (
-						<>
-							<Button variant='subtle' color='blue' onClick={() => setEditModalOpen(true)}>
-								Edit
-							</Button>
+						<Group gap={8}>
+							<ActionIcon
+								size='lg'
+								variant='subtle'
+								color='blue'
+								onClick={() => setEditModalOpen(true)}
+							>
+								<IconPencil size={16} />
+							</ActionIcon>
 							{isDeletable && (
-								<Button variant='subtle' color='red' onClick={handleDeleteGame} loading={isPending}>
-									Delete
-								</Button>
+								<ActionIcon
+									size='lg'
+									variant='subtle'
+									color='red'
+									onClick={handleDeleteGame}
+									loading={isPending}
+								>
+									<IconTrash size={16} />
+								</ActionIcon>
 							)}
-						</>
+						</Group>
 					)}
 				</Group>
 			</Group>

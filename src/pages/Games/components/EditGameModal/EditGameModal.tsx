@@ -5,7 +5,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
 import type { Game } from '@/src/api/game';
-import { useUpdateGameMutation } from '@/src/pages/Games/components/EditGameModal/editGameModal.utils';
+import { useUpdateGameMutation } from '@/src/api/mutations/gameMutations';
 
 type EditGameModalProps = {
 	isOpen: boolean;

@@ -171,11 +171,7 @@ export const EditTournament: FC = () => {
 			...updatedFields,
 		};
 
-		mutate(finalSubmissionData, {
-			onSuccess: () => {
-				methods.reset();
-			},
-		});
+		mutate(finalSubmissionData);
 	};
 
 	if (isTournamentLoading || isApplicationsLoading || isGamesLoading) {

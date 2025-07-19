@@ -1,9 +1,11 @@
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 
 import { applyTeamToTournament } from '@/src/api/team';
 import type { Tournament, TournamentSearchParams } from '@/src/api/tournament';
 import {
+	createTournament,
 	deleteTeamFromTournament,
 	getTournamentApplications,
 	getTournamentById,
@@ -12,6 +14,7 @@ import {
 	updateTournament,
 	withdrawFromTournament,
 } from '@/src/api/tournament';
+import { RoutePaths } from '@/src/models/enums/RoutePaths';
 
 type ApplyToTournamentPayload = {
 	teamId: number;
@@ -43,7 +46,7 @@ export const useGetTournamentsQuery = (params: TournamentSearchParams) => {
 
 export const useGetTournamentByIdQuery = (id: string) => {
 	return useQuery({
-		queryKey: ['tournament-details', id],
+		queryKey: ['tournament', id],
 		queryFn: () => getTournamentById(Number(id)),
 	});
 };
@@ -56,7 +59,7 @@ export const useApplyToTournamentMutation = () => {
 			applyTeamToTournament(teamId, tournamentId),
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
-				queryKey: ['tournaments', variables.tournamentId.toString()],
+				queryKey: ['tournament', variables.tournamentId.toString()],
 			});
 		},
 		onError: (error: any) => {
@@ -73,7 +76,7 @@ export const useApplyToTournamentMutation = () => {
 
 export const useGetTournamentApplicationsQuery = (id: string, isOrganizer: boolean) => {
 	return useQuery({
-		queryKey: ['tournament-applications'],
+		queryKey: ['tournament-applications', id],
 		queryFn: () => getTournamentApplications(Number(id)),
 		enabled: !!isOrganizer,
 	});
@@ -107,9 +110,11 @@ export const useManageApplicationMutation = () => {
 		mutationFn: ({ tournamentId, applicationId, accepted }: ManageApplicationPayload) =>
 			manageTournamentApplication(tournamentId, applicationId, accepted),
 		onSuccess: (_, variables) => {
-			queryClient.invalidateQueries({ queryKey: ['tournament-applications'] });
 			queryClient.invalidateQueries({
-				queryKey: ['tournament-details', variables.tournamentId.toString()],
+				queryKey: ['tournament-applications', variables.tournamentId.toString()],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ['tournament', variables.tournamentId.toString()],
 			});
 		},
 		onError: (error: any) => {
@@ -132,7 +137,7 @@ export const useRemoveTeamFromTournamentMutation = () => {
 			deleteTeamFromTournament(tournamentId, teamId),
 		onSuccess: (updatedTournament) => {
 			queryClient.invalidateQueries({
-				queryKey: ['tournament-details', updatedTournament.id.toString()],
+				queryKey: ['tournament', updatedTournament.id.toString()],
 			});
 			queryClient.invalidateQueries({ queryKey: ['tournaments'] });
 		},
@@ -156,13 +161,35 @@ export const useWithdrawFromTournamentMutation = () => {
 			withdrawFromTournament(tournamentId, applicationId),
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
-				queryKey: ['tournament-details', variables.tournamentId.toString()],
+				queryKey: ['tournament', variables.tournamentId.toString()],
 			});
 			queryClient.invalidateQueries({ queryKey: ['tournaments'] });
 		},
 		onError: (error: any) => {
 			notifications.show({
 				title: 'Team Withdraw Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
+		},
+	});
+};
+
+export const useCreateTournamentMutation = () => {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+
+	return useMutation({
+		mutationFn: createTournament,
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({ queryKey: ['tournaments'] });
+			navigate(RoutePaths.TournamentDetails.replace(':id', data.id.toString()));
+		},
+		onError: (error: any) => {
+			notifications.show({
+				title: 'Create Tournament Error',
 				message: error.response?.data?.message,
 				color: 'red',
 				position: 'top-center',

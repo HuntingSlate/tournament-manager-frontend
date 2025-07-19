@@ -1,3 +1,4 @@
+import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AddProfileLinkData } from '@/src/api/user';
@@ -21,17 +22,17 @@ export const useGetUserProfileQuery = () => {
 	});
 };
 
-export const useGetProfileByIdQuery = (id: string) => {
-	return useQuery({
-		queryKey: ['user-profile', id],
-		queryFn: () => getProfileById(Number(id)),
-	});
-};
-
 export const useGetProfileLinksQuery = () => {
 	return useQuery({
 		queryKey: ['user-profile'],
 		queryFn: getProfileLinks,
+	});
+};
+
+export const useGetProfileByIdQuery = (id: string) => {
+	return useQuery({
+		queryKey: ['user-profile', id],
+		queryFn: () => getProfileById(Number(id)),
 	});
 };
 
@@ -50,8 +51,14 @@ export const useUpdateProfileInformationMutation = () => {
 		onSuccess: (data) => {
 			queryClient.setQueryData(['user-profile'], data);
 		},
-		onError: (error) => {
-			console.error(error);
+		onError: (error: any) => {
+			notifications.show({
+				title: 'Update Profile Information Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
 		},
 	});
 };
@@ -59,8 +66,14 @@ export const useUpdateProfileInformationMutation = () => {
 export const useUpdateProfilePasswordMutation = () => {
 	return useMutation({
 		mutationFn: changePassword,
-		onError: (error) => {
-			console.error(error);
+		onError: (error: any) => {
+			notifications.show({
+				title: 'Update Password Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
 		},
 	});
 };
@@ -74,7 +87,13 @@ export const useAddProfileLinkMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
-			console.error(error);
+			notifications.show({
+				title: 'Add Profile Link Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
 		},
 	});
 };
@@ -89,7 +108,13 @@ export const useUpdateProfileLinkMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
-			console.error(error);
+			notifications.show({
+				title: 'Update Profile Link Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
 		},
 	});
 };
@@ -103,7 +128,13 @@ export const useRemoveProfileLinkMutation = () => {
 			queryClient.invalidateQueries({ queryKey: ['user-profile'] });
 		},
 		onError: (error: any) => {
-			console.error(error);
+			notifications.show({
+				title: 'Remove Profile Link Error',
+				message: error.response?.data?.message,
+				color: 'red',
+				position: 'top-center',
+				autoClose: 5000,
+			});
 		},
 	});
 };

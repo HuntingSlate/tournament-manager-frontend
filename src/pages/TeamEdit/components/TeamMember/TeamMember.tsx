@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { Button, Flex, Group, Stack, Text } from '@mantine/core';
 import { IconCrown, IconUser } from '@tabler/icons-react';
 
-import { useRemoveMemberFromTeamMutation } from '@/src/pages/TeamEdit/teamEdit.utils';
+import { useRemoveMemberFromTeamMutation } from '@/src/api/mutations/teamMutations';
 import { vars } from '@/src/theme';
 
 type TeamMemberProps = {

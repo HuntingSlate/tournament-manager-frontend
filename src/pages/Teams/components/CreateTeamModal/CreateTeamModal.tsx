@@ -6,7 +6,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
 import { useGetGamesQuery } from '@/src/api/mutations/gameMutations';
-import { useCreateTeamMutation } from '@/src/pages/Teams/components/CreateTeamModal/createTeamModal.utils';
+import { useCreateTeamMutation } from '@/src/api/mutations/teamMutations';
 
 type CreateTeamModalProps = {
 	isOpen: boolean;
@@ -104,12 +104,12 @@ export const CreateTeamModal: FC<CreateTeamModalProps> = ({ isOpen, onClose }) =
 								</InputWrapper>
 							)}
 						/>
-						<Group style={{ width: '100%', flexWrap: 'nowrap', paddingTop: 16 }}>
-							<Button onClick={handleCancel} color='blue' style={{ width: '100%' }}>
-								Cancel
+						<Group gap={8} w='100%' wrap='nowrap'>
+							<Button type='submit' variant='filled' color='blue' w={'75%'} loading={isPending}>
+								Create
 							</Button>
-							<Button type='submit' loading={isPending} color='green' style={{ width: '100%' }}>
-								Save
+							<Button variant='default' color='black' w={'25%'} onClick={handleCancel}>
+								Cancel
 							</Button>
 						</Group>
 					</Stack>

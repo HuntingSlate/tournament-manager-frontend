@@ -1,11 +1,11 @@
 import { Button, Group, InputWrapper, Loader, Modal, Select, Stack, Text } from '@mantine/core';
 import { useMemo, useState, type FC } from 'react';
 
-import { useGetTeamDetailsQuery } from '@/src/pages/TeamDetails/teamDetails.utils';
 import {
 	useAddMemberToTeamMutation,
-	useGetUsersQuery,
-} from '@/src/pages/TeamEdit/components/AddMemberModal/addMemberModal.utils';
+	useGetTeamDetailsQuery,
+} from '@/src/api/mutations/teamMutations';
+import { useProfileSearchQuery } from '@/src/api/mutations/userMutations';
 
 type AddMemberModalProps = {
 	isOpen: boolean;
@@ -16,7 +16,7 @@ type AddMemberModalProps = {
 export const AddMemberModal: FC<AddMemberModalProps> = ({ isOpen, onClose, teamId }) => {
 	const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-	const { data, isLoading } = useGetUsersQuery();
+	const { data, isLoading } = useProfileSearchQuery('');
 	const { data: teamData, isLoading: isTeamLoading } = useGetTeamDetailsQuery(teamId.toString());
 	const { mutate, isPending } = useAddMemberToTeamMutation();
 

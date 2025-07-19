@@ -8,7 +8,7 @@ import { MatchCard } from '@/src/components/TournamentBracket/MatchCard';
 import { PlaceholderCard } from '@/src/components/TournamentBracket/PlaceholderCard';
 import '@/src/components/TournamentBracket/TournamentBracket.css';
 
-const generateFullBracket = (apiMatches: Match[]): (Match | null)[][] => {
+const generateFullBracket = (apiMatches: Match[]): (Partial<Match> | null)[][] => {
 	if (!apiMatches || apiMatches.length === 0) {
 		return [];
 	}
@@ -23,7 +23,7 @@ const generateFullBracket = (apiMatches: Match[]): (Match | null)[][] => {
 		return [];
 	}
 
-	const fullBracket: (Match | null)[][] = [];
+	const fullBracket: (Partial<Match> | null)[][] = [];
 	let matchesInCurrentRound = initialTeamCount / 2;
 	let roundNumber = 1;
 
@@ -34,11 +34,50 @@ const generateFullBracket = (apiMatches: Match[]): (Match | null)[][] => {
 	});
 
 	while (matchesInCurrentRound >= 1) {
-		const roundSlots: (Match | null)[] = [];
+		const roundSlots: (Partial<Match> | null)[] = [];
+		const previousRound = roundNumber > 1 ? fullBracket[roundNumber - 2] : [];
+
 		for (let i = 1; i <= matchesInCurrentRound; i++) {
 			const matchKey = `${roundNumber}-${i}`;
 			const foundMatch = matchesMap.get(matchKey);
-			roundSlots.push(foundMatch || null);
+
+			if (foundMatch) {
+				roundSlots.push(foundMatch);
+			} else if (roundNumber > 1) {
+				const parentMatch1 = previousRound[(i - 1) * 2];
+				const parentMatch2 = previousRound[(i - 1) * 2 + 1];
+
+				const getWinner = (match: Partial<Match> | null) => {
+					if (!match || match.status !== 'COMPLETED' || match.winningTeamId == null) {
+						return null;
+					}
+					const isFirstTeamWinner = match.winningTeamId === match.firstTeamId;
+					return {
+						id: match.winningTeamId,
+						name: isFirstTeamWinner ? match.firstTeamName : match.secondTeamName,
+					};
+				};
+
+				const winner1 = getWinner(parentMatch1);
+				const winner2 = getWinner(parentMatch2);
+
+				if (winner1 || winner2) {
+					const partialMatch: Partial<Match> = {
+						bracketLevel: roundNumber,
+						matchNumberInRound: i,
+						status: 'SCHEDULED',
+						firstTeamId: winner1?.id ?? undefined,
+						firstTeamName: winner1?.name ?? undefined,
+						secondTeamId: winner2?.id ?? undefined,
+						secondTeamName: winner2?.name ?? undefined,
+					};
+					roundSlots.push(partialMatch);
+				} else {
+					roundSlots.push(null);
+				}
+			} else {
+				roundSlots.push(null);
+			}
 		}
 		fullBracket.push(roundSlots);
 
@@ -60,8 +99,11 @@ export const TournamentBracket: FC<TournamentBracketProps> = ({ matches, canEdit
 	const [isEditMatchModalOpen, setIsEditMatchModalOpen] = useState(false);
 	const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
-	const handleSelectMatch = (match: Match) => {
-		setSelectedMatch(match);
+	const handleSelectMatch = (match: Partial<Match>) => {
+		if (typeof match.id !== 'number') {
+			return;
+		}
+		setSelectedMatch(match as Match);
 		if (canEditMatch) {
 			setIsEditMatchModalOpen(true);
 			return;
@@ -81,7 +123,11 @@ export const TournamentBracket: FC<TournamentBracketProps> = ({ matches, canEdit
 						<div className='matches-container'>
 							{round.map((match, matchIndex) =>
 								match ? (
-									<MatchCard key={match.id} match={match} onClick={handleSelectMatch} />
+									<MatchCard
+										key={match.id ?? `partial-${roundIndex}-${matchIndex}`}
+										match={match}
+										onClick={handleSelectMatch}
+									/>
 								) : (
 									<PlaceholderCard key={`placeholder-${roundIndex}-${matchIndex}`} />
 								)

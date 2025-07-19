@@ -4,8 +4,8 @@ import { useEffect, type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import z from 'zod';
 
+import { useUpdateTeamLinkMutation } from '@/src/api/mutations/teamMutations';
 import type { TeamLink } from '@/src/api/team';
-import { useUpdateTeamLinkMutation } from '@/src/pages/TeamEdit/teamEdit.utils';
 
 type EditLinkModalProps = {
 	isOpen: boolean;

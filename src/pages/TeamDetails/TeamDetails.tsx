@@ -13,14 +13,16 @@ import {
 import { IconChevronLeft } from '@tabler/icons-react';
 import { useNavigate, useParams } from 'react-router';
 
-import { useGetTeamTournamentApplicationsQuery } from '@/src/api/mutations/teamMutations';
+import {
+	useGetTeamDetailsQuery,
+	useGetTeamTournamentApplicationsQuery,
+} from '@/src/api/mutations/teamMutations';
 import { PageLayout } from '@/src/components/layouts/PageLayout';
 import { RoutePaths } from '@/src/models/enums/RoutePaths';
 import { TeamLinks } from '@/src/pages/TeamDetails/components/TeamLinks';
 import { TeamMember } from '@/src/pages/TeamDetails/components/TeamMember';
 import { TeamTournament } from '@/src/pages/TeamDetails/components/TeamTournament/TeamTournament';
 import { TeamTournamentApplications } from '@/src/pages/TeamDetails/components/TeamTournamentApplications';
-import { useGetTeamDetailsQuery } from '@/src/pages/TeamDetails/teamDetails.utils';
 import { useAuthStore } from '@/src/store/authStore';
 import { vars } from '@/src/theme';
 
